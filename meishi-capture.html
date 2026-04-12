@@ -65,7 +65,7 @@
   .chip.active-mid  { background:var(--accent-dim); border-color:var(--accent); color:var(--accent); }
   .chip.active-low  { background:rgba(255,255,255,0.05); border-color:#555; color:#aaa; }
   .chip.active-yes  { background:rgba(224,112,96,0.15); border-color:var(--danger); color:var(--danger); }
-  .chip.active-no   { background:rgba(255,255,255,0.05); border-color:#555; color:#666; }
+  .chip.active-no   { background:rgba(109,184,138,0.15); border-color:var(--success); color:var(--success); }
 
   /* Submit */
   .submit-btn { width:100%; padding:15px; border-radius:var(--radius); border:none; background:var(--accent); color:#1a1400; font-size:15px; font-weight:600; cursor:pointer; transition:opacity 0.15s; }
@@ -190,13 +190,25 @@ setChip('follow','no');
 // API Key
 function saveApiKey() {
   const val = document.getElementById('apiKeyInput').value.trim();
-  if (!val.startsWith('sk-ant-')) { showToast('正しいAPIキーを入力してください（sk-ant-...）'); return; }
+  if (!val || val.length < 20) { showToast('APIキーを入力してください'); return; }
   anthropicKey = val;
+  localStorage.setItem('anthropic_key', val);
   document.getElementById('apiKeyStatus').textContent = '設定済み ✓';
   document.getElementById('apiKeyStatus').className = 'apikey-status ok';
   updateSubmitBtn();
   showToast('APIキーを設定しました');
 }
+
+// Load saved API key on startup
+(function() {
+  const saved = localStorage.getItem('anthropic_key');
+  if (saved) {
+    anthropicKey = saved;
+    document.getElementById('apiKeyInput').value = saved;
+    document.getElementById('apiKeyStatus').textContent = '設定済み ✓';
+    document.getElementById('apiKeyStatus').className = 'apikey-status ok';
+  }
+})();
 
 // Photos
 function handleFiles(newFiles) {
