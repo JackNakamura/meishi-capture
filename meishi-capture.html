@@ -261,6 +261,50 @@
     pointer-events: none; white-space: nowrap;
   }
   .toast.show { opacity: 1; }
+
+  /* ── API Key modal ── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000;
+  }
+  .modal-box {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    width: 90%; max-width: 400px;
+  }
+  .modal-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+  .modal-sub { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+  .modal-input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    border: 0.5px solid var(--border);
+    background: var(--surface2);
+    color: var(--text);
+    font-size: 13px;
+    font-family: 'Courier New', monospace;
+    outline: none;
+  }
+  .modal-input:focus { border-color: var(--accent); }
+  .modal-actions { display: flex; gap: 8px; margin-top: 14px; }
+  .modal-save {
+    flex: 1; padding: 10px;
+    border: none; border-radius: var(--radius-sm);
+    background: var(--accent); color: #1a1400;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+  .modal-save:disabled { opacity: 0.35; cursor: not-allowed; }
+  .key-badge {
+    font-size: 11px; padding: 4px 10px;
+    border-radius: 999px; border: 0.5px solid var(--border);
+    background: var(--surface2); color: var(--muted);
+    cursor: pointer; transition: all 0.15s;
+  }
+  .key-badge:hover { border-color: var(--accent); color: var(--accent); }
 </style>
 </head>
 <body>
@@ -270,6 +314,7 @@
     <div class="header-title">名刺キャプチャ</div>
     <div class="header-date" id="headerDate"></div>
   </div>
+  <span class="key-badge" id="keyBadge" onclick="showApiKeyModal()">🔑 API Key</span>
   <button class="drive-btn" id="driveBtn" onclick="toggleDrive()">
     <span id="driveIcon">⬡</span>
     <span id="driveLabel">Drive接続</span>
@@ -343,12 +388,70 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- API Key modal -->
+<div class="modal-overlay" id="apiKeyModal" style="display:none">
+  <div class="modal-box">
+    <div class="modal-title">Anthropic API Key</div>
+    <div class="modal-sub">キーはこの端末のlocalStorageにのみ保存されます</div>
+    <input class="modal-input" id="apiKeyInput" type="password" placeholder="sk-ant-..." autocomplete="off">
+    <div class="modal-actions">
+      <button class="modal-save" id="apiKeySaveBtn" onclick="saveApiKey()">保存</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ════════════════════════════════════════════
 //  CONFIG — ここを書き換える
 // ════════════════════════════════════════════
 const GOOGLE_CLIENT_ID = '1017711631388-9kqufvefuc041ajrg36ds70h5amqd3cv.apps.googleusercontent.com';
 const DRIVE_FOLDER_NAME = 'life/contacts/people'; // Driveに作るフォルダ名
+const API_KEY_STORAGE = 'meishi_anthropic_api_key';
+
+// ════════════════════════════════════════════
+//  API Key management
+// ════════════════════════════════════════════
+function getApiKey() { return localStorage.getItem(API_KEY_STORAGE) || ''; }
+
+function showApiKeyModal() {
+  document.getElementById('apiKeyInput').value = getApiKey();
+  document.getElementById('apiKeyModal').style.display = 'flex';
+  document.getElementById('apiKeyInput').focus();
+}
+
+function saveApiKey() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  if (!key) return;
+  localStorage.setItem(API_KEY_STORAGE, key);
+  document.getElementById('apiKeyModal').style.display = 'none';
+  updateKeyBadge();
+  showToast('APIキーを保存しました');
+}
+
+function updateKeyBadge() {
+  const badge = document.getElementById('keyBadge');
+  const key = getApiKey();
+  if (key) {
+    badge.textContent = '🔑 ...'+key.slice(-4);
+    badge.style.borderColor = 'var(--success)';
+    badge.style.color = 'var(--success)';
+  } else {
+    badge.textContent = '🔑 API Key';
+    badge.style.borderColor = '';
+    badge.style.color = '';
+  }
+}
+
+// Enterキーで保存
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('apiKeyInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') saveApiKey();
+  });
+});
+
+// 初回起動時チェック
+if (!getApiKey()) { setTimeout(showApiKeyModal, 500); }
+updateKeyBadge();
 
 // ════════════════════════════════════════════
 //  State
@@ -509,6 +612,7 @@ function toBase64(file) {
 }
 
 async function startScan() {
+  if (!getApiKey()) { showApiKeyModal(); return; }
   if (isRecording) recognition.stop();
   const context = document.getElementById('contextInput').value.trim();
   const memo    = document.getElementById('memoInput').value.trim();
@@ -532,7 +636,7 @@ async function startScan() {
 
       const res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-api-key': getApiKey(), 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 1000,
