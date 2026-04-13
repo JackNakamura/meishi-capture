@@ -325,13 +325,10 @@ async function startScan() {
     container.appendChild(loadDiv);
 
     try {
-      document.getElementById('resultsArea').innerHTML = '<div style="color:orange;padding:1rem">STEP1: files=' + files.length + '</div>';
       const b64 = await toBase64(files[i]);
-      document.getElementById('resultsArea').innerHTML += '<div style="color:cyan;padding:1rem">STEP2: b64 len=' + b64.length + '</div>';
       const media = files[i].type || 'image/jpeg';
       const prompt = buildPrompt(context, memo, flags.importance, flags.follow, today, followupDate);
 
-      document.getElementById('resultsArea').innerHTML = '<div style="color:yellow;padding:1rem">DEBUG: key=' + anthropicKey.substring(0,10) + ' len=' + anthropicKey.length + '</div>';
       const res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
