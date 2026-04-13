@@ -191,10 +191,18 @@ setChip('follow','no');
 // API Key
 function saveApiKey() {
   const val = document.getElementById('apiKeyInput').value.trim();
-  if (!val || val.length < 20) { showToast('APIキーを入力してください'); return; }
+  if (!val || val.length < 20) {
+    anthropicKey = '';
+    localStorage.removeItem('anthropic_key');
+    document.getElementById('apiKeyStatus').textContent = '未設定（スキャンに必要です）';
+    document.getElementById('apiKeyStatus').className = 'apikey-status';
+    updateSubmitBtn();
+    showToast('APIキーをクリアしました');
+    return;
+  }
   anthropicKey = val;
   localStorage.setItem('anthropic_key', val);
-  document.getElementById('apiKeyStatus').textContent = '設定済み ✓';
+  document.getElementById('apiKeyStatus').textContent = '設定済み ✓ (長さ:' + val.length + ')';
   document.getElementById('apiKeyStatus').className = 'apikey-status ok';
   updateSubmitBtn();
   showToast('APIキーを設定しました');
@@ -341,7 +349,8 @@ async function startScan() {
       });
 
       const data = await res.json();
-      if (data.error) throw new Error(JSON.stringify(data.error));
+      if (data.error) throw new Error(data.error.type + ': ' + data.error.message);
+      if (!data.content) throw new Error('レスポンス異常: ' + JSON.stringify(data).slice(0,100));
       const md = (data.content||[]).map(b=>b.text||'').join('').trim();
       const nameMatch = md.match(/^# (.+)/m);
       const name = nameMatch ? nameMatch[1].trim() : `名刺${i+1}`;
