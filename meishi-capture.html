@@ -300,11 +300,21 @@ function addMonths(dateStr, n) {
 }
 
 function toBase64(file) {
-  return new Promise((res,rej) => {
-    const r = new FileReader();
-    r.onload = () => res(r.result.split(',')[1]);
-    r.onerror = rej;
-    r.readAsDataURL(file);
+  return new Promise((res, rej) => {
+    try {
+      const blob = file.slice(0, file.size, file.type || 'image/jpeg');
+      const newFile = new File([blob], file.name || 'image.jpg', { type: file.type || 'image/jpeg' });
+      const r = new FileReader();
+      r.onload = () => {
+        try {
+          const result = r.result;
+          const b64 = result.split(',')[1];
+          res(b64);
+        } catch(e) { rej(new Error('split error: ' + e.message)); }
+      };
+      r.onerror = (e) => rej(new Error('FileReader error: ' + r.error?.message || 'read failed'));
+      r.readAsDataURL(newFile);
+    } catch(e) { rej(new Error('toBase64 setup error: ' + e.message)); }
   });
 }
 
