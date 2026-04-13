@@ -467,7 +467,7 @@ function toggleDrive() {
       await ensureSheetHeader();
     }
   });
-  client.requestAccessToken({ prompt:'consent' });
+  client.requestAccessToken({ prompt:'' });
 }
 
 async function ensureFolder(path) {
