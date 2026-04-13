@@ -515,14 +515,14 @@ async function saveToDrive(i) {
 // ── Google Sheets ──
 async function ensureSheetHeader() {
   try {
-    const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/A1:H1`,
+    const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/A1:I1`,
       { headers: { Authorization: `Bearer ${accessToken}` } });
     const data = await res.json();
     if (!data.values || data.values.length === 0) {
-      await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/A1:H1?valueInputOption=RAW`,{
+      await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/A1:I1?valueInputOption=RAW`,{
         method: 'PUT',
         headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ values: [['日付','氏名','会社','役職','重要度','フォロー要否','イベント','会話メモ']] })
+        body: JSON.stringify({ values: [['日付','氏名','会社','役職','重要度','フォロー要否','イベント','会話メモ','メールアドレス']] })
       });
     }
   } catch(e) { console.error('Sheet header error:', e); }
@@ -543,10 +543,12 @@ async function saveToSheet(md, context) {
     const imp    = impMatch    ? impMatch[1].trim()    : '';
     const follow = followMatch ? followMatch[1].trim() : '';
     const memo   = memoMatch   ? memoMatch[1].replace(/^- /gm,'').replace(/\n/g,' ').trim().slice(0,100) : '';
-    await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/A:H:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`,{
+    const emailMatch = md.match(/Email: ([^\n]+)/);
+    const email = emailMatch && !emailMatch[1].includes('不明') ? emailMatch[1].trim() : '';
+    await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/A:I:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`,{
       method: 'POST',
       headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ values: [[today, name, comp, role, imp, follow, context, memo]] })
+      body: JSON.stringify({ values: [[today, name, comp, role, imp, follow, context, memo, email]] })
     });
   } catch(e) { console.error('Sheet save error:', e); }
 }
