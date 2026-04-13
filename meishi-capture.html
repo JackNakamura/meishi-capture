@@ -327,6 +327,7 @@ async function startScan() {
     try {
       document.getElementById('resultsArea').innerHTML = '<div style="color:orange;padding:1rem">STEP1: files=' + files.length + '</div>';
       const b64 = await toBase64(files[i]);
+      document.getElementById('resultsArea').innerHTML += '<div style="color:cyan;padding:1rem">STEP2: b64 len=' + b64.length + '</div>';
       const media = files[i].type || 'image/jpeg';
       const prompt = buildPrompt(context, memo, flags.importance, flags.follow, today, followupDate);
 
