@@ -302,19 +302,23 @@ function addMonths(dateStr, n) {
 function toBase64(file) {
   return new Promise((res, rej) => {
     try {
-      const blob = file.slice(0, file.size, file.type || 'image/jpeg');
-      const newFile = new File([blob], file.name || 'image.jpg', { type: file.type || 'image/jpeg' });
-      const r = new FileReader();
-      r.onload = () => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
         try {
-          const result = r.result;
-          const b64 = result.split(',')[1];
-          res(b64);
-        } catch(e) { rej(new Error('split error: ' + e.message)); }
+          const canvas = document.createElement('canvas');
+          canvas.width = img.naturalWidth || img.width;
+          canvas.height = img.naturalHeight || img.height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+          URL.revokeObjectURL(url);
+          res(dataUrl.split(',')[1]);
+        } catch(e) { rej(new Error('canvas error: ' + e.message)); }
       };
-      r.onerror = (e) => rej(new Error('FileReader error: ' + r.error?.message || 'read failed'));
-      r.readAsDataURL(newFile);
-    } catch(e) { rej(new Error('toBase64 setup error: ' + e.message)); }
+      img.onerror = (e) => rej(new Error('img load error'));
+      img.src = url;
+    } catch(e) { rej(new Error('createObjectURL error: ' + e.message)); }
   });
 }
 
