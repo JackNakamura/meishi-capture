@@ -220,8 +220,18 @@ function saveApiKey() {
 })();
 
 // Photos
-function handleFiles(newFiles) {
-  for (const f of newFiles) if (f.type.startsWith('image/')) files.push(f);
+async function handleFiles(newFiles) {
+  for (const f of newFiles) {
+    if (!f.type.startsWith('image/')) continue;
+    const arrayBuffer = await f.arrayBuffer();
+    const bytes = new Uint8Array(arrayBuffer);
+    let binary = '';
+    for (let j = 0; j < bytes.byteLength; j++) {
+      binary += String.fromCharCode(bytes[j]);
+    }
+    const base64 = btoa(binary);
+    files.push({ base64, mediaType: f.type || 'image/jpeg', name: f.name });
+  }
   renderThumbs();
   updateSubmitBtn();
 }
@@ -230,7 +240,7 @@ function renderThumbs() {
   const el = document.getElementById('thumbs');
   el.innerHTML = '';
   files.forEach((f,i) => {
-    const url = URL.createObjectURL(f);
+    const url = `data:${f.mediaType};base64,${f.base64}`;
     const d = document.createElement('div');
     d.className = 'thumb';
     d.innerHTML = `<img src="${url}"><button class="thumb-rm" onclick="removeFile(${i})">✕</button>`;
@@ -299,16 +309,6 @@ function addMonths(dateStr, n) {
   return d.toISOString().split('T')[0];
 }
 
-async function toBase64(file) {
-  const arrayBuffer = await file.arrayBuffer();
-  const bytes = new Uint8Array(arrayBuffer);
-  let binary = '';
-  for (let i = 0; i < bytes.byteLength; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  return btoa(binary);
-}
-
 async function startScan() {
   const context = document.getElementById('contextInput').value.trim();
   const memo    = document.getElementById('memoInput').value.trim();
@@ -326,8 +326,8 @@ async function startScan() {
     container.appendChild(loadDiv);
 
     try {
-      const b64 = await toBase64(files[i]);
-      const media = files[i].type || 'image/jpeg';
+      const b64 = files[i].base64;
+      const media = files[i].mediaType;
       const prompt = buildPrompt(context, memo, flags.importance, flags.follow, today, followupDate);
 
       const res = await fetch('https://api.anthropic.com/v1/messages', {
