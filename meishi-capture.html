@@ -325,6 +325,7 @@ async function startScan() {
     container.appendChild(loadDiv);
 
     try {
+      document.getElementById('resultsArea').innerHTML = '<div style="color:orange;padding:1rem">STEP1: files=' + files.length + '</div>';
       const b64 = await toBase64(files[i]);
       const media = files[i].type || 'image/jpeg';
       const prompt = buildPrompt(context, memo, flags.importance, flags.follow, today, followupDate);
