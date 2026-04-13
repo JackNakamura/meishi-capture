@@ -329,7 +329,7 @@ async function startScan() {
       const media = files[i].type || 'image/jpeg';
       const prompt = buildPrompt(context, memo, flags.importance, flags.follow, today, followupDate);
 
-      alert('sending key: [' + anthropicKey.substring(0,15) + ']')
+      document.getElementById('resultsArea').innerHTML = '<div style="color:yellow;padding:1rem">DEBUG: key=' + anthropicKey.substring(0,10) + ' len=' + anthropicKey.length + '</div>';
       const res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
