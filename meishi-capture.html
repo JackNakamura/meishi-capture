@@ -340,7 +340,7 @@ function updateSubmitBtn() {
 }
 
 // ── Scan ──
-const SYSTEM_PROMPT = `あなたは名刺のOCR・構造化アシスタントです。名刺画像を読み取り、指定のMarkdown形式のみを出力してください。日本語・英語・タイ語対応。読み取れない項目は「（不明）」。余分な説明文や前置きは不要。Markdownのみ出力。`;
+const SYSTEM_PROMPT = 'あなたは名刺のOCR・構造化アシスタントです。名刺画像を読み取り、指定のMarkdown形式のみを出力してください。日本語・英語・タイ語対応。読み取れない項目は「（不明）」。余分な説明文や前置きは不要。Markdownのみ出力。画像が上下逆転・横向きなど回転していても正しく読み取ってください。名刺の表面に書かれた情報を全て正確に抽出してください。';
 
 function buildPrompt(context, today) {
   const followupDate = addMonths(today, 3);
@@ -405,7 +405,7 @@ async function startScan() {
           'anthropic-dangerous-direct-browser-access': 'true'
         },
         body: JSON.stringify({
-          model: 'claude-haiku-4-5-20251001',
+          model: 'claude-sonnet-4-6',
           max_tokens: 1000,
           system: SYSTEM_PROMPT,
           messages: [{ role:'user', content:[
