@@ -299,27 +299,14 @@ function addMonths(dateStr, n) {
   return d.toISOString().split('T')[0];
 }
 
-function toBase64(file) {
-  return new Promise((res, rej) => {
-    try {
-      const url = URL.createObjectURL(file);
-      const img = new Image();
-      img.onload = () => {
-        try {
-          const canvas = document.createElement('canvas');
-          canvas.width = img.naturalWidth || img.width;
-          canvas.height = img.naturalHeight || img.height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0);
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-          URL.revokeObjectURL(url);
-          res(dataUrl.split(',')[1]);
-        } catch(e) { rej(new Error('canvas error: ' + e.message)); }
-      };
-      img.onerror = (e) => rej(new Error('img load error'));
-      img.src = url;
-    } catch(e) { rej(new Error('createObjectURL error: ' + e.message)); }
-  });
+async function toBase64(file) {
+  const arrayBuffer = await file.arrayBuffer();
+  const bytes = new Uint8Array(arrayBuffer);
+  let binary = '';
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
 }
 
 async function startScan() {
