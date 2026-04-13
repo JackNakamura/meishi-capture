@@ -428,12 +428,12 @@ async function startScan() {
           <div class="result-name">${escHtml(name)}</div>
           <div class="result-actions">
             <button class="action-btn" onclick="copyMd(${i})">コピー</button>
-            <button class="action-btn" id="saveBtn-${i}" onclick="saveToDrive(${i})">${accessToken?'Drive保存':'DL'}</button>
+            <span class="action-btn saved" id="saveBtn-${i}">保存済 ✓</span>
           </div>
         </div>
         <div class="result-body">${escHtml(md)}</div>`;
 
-      if (accessToken) saveToDrive(i);
+      if (accessToken) { saveToDrive(i); }
 
     } catch(e) {
       const msg = e?.message || e?.name || String(e) || 'unknown error';
@@ -488,7 +488,7 @@ async function gapiReq(url, method='GET', body=null) {
 }
 
 async function saveToDrive(i) {
-  if (!accessToken) { downloadMd(i); return; }
+  if (!accessToken) return;
   const { filename, md } = results[i];
   const btn = document.getElementById('saveBtn-'+i);
   if (!btn) return;
@@ -510,13 +510,6 @@ async function saveToDrive(i) {
     btn.textContent = 'Drive保存';
     showToast('保存エラー: '+e.message);
   }
-}
-
-function downloadMd(i) {
-  const { filename, md } = results[i];
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([md],{type:'text/markdown'}));
-  a.download = filename; a.click();
 }
 
 // ── Google Sheets ──
