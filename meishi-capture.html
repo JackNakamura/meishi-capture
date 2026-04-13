@@ -6,166 +6,230 @@
 <title>名刺キャプチャ</title>
 <script src="https://accounts.google.com/gsi/client" async></script>
 <style>
-  :root {
-    --bg: #0e0e0f;
-    --surface: #1a1a1c;
-    --surface2: #242426;
-    --border: #2e2e32;
-    --text: #f0ede8;
-    --muted: #888580;
-    --accent: #e8c87a;
-    --accent-dim: rgba(232,200,122,0.12);
-    --danger: #e07060;
-    --success: #6db88a;
-    --radius: 12px;
-    --radius-sm: 8px;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  body { background: var(--bg); color: var(--text); font-family: -apple-system,'Hiragino Sans','Noto Sans JP',sans-serif; min-height:100vh; padding-bottom:2rem; }
-  .header { padding:1.25rem 1.25rem 0.75rem; border-bottom:0.5px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
-  .header-title { font-size:17px; font-weight:600; letter-spacing:-0.01em; }
-  .header-date { font-size:12px; color:var(--muted); }
-  .drive-btn { font-size:12px; padding:6px 12px; border-radius:999px; border:0.5px solid var(--border); background:var(--surface2); color:var(--muted); cursor:pointer; display:flex; align-items:center; gap:5px; transition:all 0.15s; }
-  .drive-btn.connected { border-color:var(--success); color:var(--success); }
-  .container { padding:1.25rem; display:flex; flex-direction:column; gap:1.25rem; }
-  .section-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px; }
+:root {
+  --bg: #0e0e0f;
+  --surface: #1a1a1c;
+  --surface2: #242426;
+  --border: #2e2e32;
+  --text: #f0ede8;
+  --muted: #888580;
+  --accent: #e8c87a;
+  --accent-dim: rgba(232,200,122,0.12);
+  --danger: #e07060;
+  --success: #6db88a;
+  --info: #4a90d9;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { background: var(--bg); color: var(--text); font-family: -apple-system,'Hiragino Sans','Noto Sans JP',sans-serif; min-height: 100vh; }
 
-  /* API Key section */
-  .apikey-row { display:flex; gap:8px; }
-  .apikey-row input { flex:1; border-radius:var(--radius); border:0.5px solid var(--border); padding:10px 12px; font-size:13px; font-family:monospace; color:var(--text); background:var(--surface); outline:none; }
-  .apikey-row input:focus { border-color:var(--accent); }
-  .apikey-save { padding:10px 16px; border-radius:var(--radius); border:0.5px solid var(--accent); background:var(--accent-dim); color:var(--accent); font-size:13px; cursor:pointer; white-space:nowrap; }
-  .apikey-status { font-size:12px; color:var(--muted); margin-top:4px; }
-  .apikey-status.ok { color:var(--success); }
+/* Header */
+.header { padding: 1rem 1.25rem 0; border-bottom: 0.5px solid var(--border); }
+.header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+.header-title { font-size: 17px; font-weight: 600; }
+.header-date { font-size: 11px; color: var(--muted); }
+.drive-btn { font-size: 12px; padding: 5px 10px; border-radius: 999px; border: 0.5px solid var(--border); background: var(--surface2); color: var(--muted); cursor: pointer; display: flex; align-items: center; gap: 4px; }
+.drive-btn.connected { border-color: var(--success); color: var(--success); }
 
-  /* Photo */
-  .photo-zone { border:0.5px dashed var(--border); border-radius:var(--radius); padding:1.5rem 1rem; text-align:center; cursor:pointer; background:var(--surface); position:relative; transition:border-color 0.15s; }
-  .photo-zone:hover { border-color:var(--accent); }
-  .photo-zone input { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
-  .photo-icon { font-size:28px; margin-bottom:6px; }
-  .photo-text { font-size:14px; font-weight:500; }
-  .photo-sub { font-size:12px; color:var(--muted); margin-top:3px; }
-  .thumbs { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-top:10px; }
-  .thumb { aspect-ratio:1; border-radius:var(--radius-sm); overflow:hidden; background:var(--surface2); position:relative; }
-  .thumb img { width:100%; height:100%; object-fit:cover; }
-  .thumb-rm { position:absolute; top:3px; right:3px; width:18px; height:18px; background:rgba(0,0,0,0.7); border-radius:50%; font-size:10px; color:#fff; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+/* Tabs */
+.tabs { display: flex; gap: 0; }
+.tab { flex: 1; padding: 10px 0; text-align: center; font-size: 13px; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-  /* Textarea */
-  textarea { width:100%; border-radius:var(--radius); border:0.5px solid var(--border); padding:12px 14px; font-size:14px; font-family:inherit; color:var(--text); background:var(--surface); resize:none; line-height:1.6; outline:none; transition:border-color 0.15s; }
-  textarea:focus { border-color:var(--accent); }
-  textarea::placeholder { color:var(--muted); }
+/* Container */
+.container { padding: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem; padding-bottom: 2rem; }
+.tab-content { display: none; }
+.tab-content.active { display: flex; flex-direction: column; gap: 1.25rem; }
 
-  /* Flags */
-  .flags-row { display:flex; flex-direction:column; gap:10px; }
-  .flag-group { display:flex; flex-direction:column; gap:6px; }
-  .flag-label { font-size:12px; color:var(--muted); }
-  .chips { display:flex; gap:6px; flex-wrap:wrap; }
-  .chip { padding:8px 16px; border-radius:999px; border:0.5px solid var(--border); font-size:13px; cursor:pointer; background:var(--surface); color:var(--muted); transition:all 0.12s; user-select:none; -webkit-user-select:none; }
-  .chip.active-high { background:rgba(224,112,96,0.15); border-color:var(--danger); color:var(--danger); }
-  .chip.active-mid  { background:var(--accent-dim); border-color:var(--accent); color:var(--accent); }
-  .chip.active-low  { background:rgba(255,255,255,0.05); border-color:#555; color:#aaa; }
-  .chip.active-yes  { background:rgba(224,112,96,0.15); border-color:var(--danger); color:var(--danger); }
-  .chip.active-no   { background:rgba(109,184,138,0.15); border-color:var(--success); color:var(--success); }
+/* Labels */
+.section-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
 
-  /* Submit */
-  .submit-btn { width:100%; padding:15px; border-radius:var(--radius); border:none; background:var(--accent); color:#1a1400; font-size:15px; font-weight:600; cursor:pointer; transition:opacity 0.15s; }
-  .submit-btn:disabled { opacity:0.35; cursor:not-allowed; }
-  .submit-btn:not(:disabled):hover { opacity:0.9; }
+/* API Key */
+.apikey-row { display: flex; gap: 8px; }
+.apikey-row input { flex: 1; border-radius: var(--radius); border: 0.5px solid var(--border); padding: 10px 12px; font-size: 13px; font-family: monospace; color: var(--text); background: var(--surface); outline: none; }
+.apikey-row input:focus { border-color: var(--accent); }
+.apikey-save { padding: 10px 16px; border-radius: var(--radius); border: 0.5px solid var(--accent); background: var(--accent-dim); color: var(--accent); font-size: 13px; cursor: pointer; white-space: nowrap; }
+.apikey-status { font-size: 12px; color: var(--muted); margin-top: 4px; }
+.apikey-status.ok { color: var(--success); }
 
-  /* Results */
-  .result-card { border:0.5px solid var(--border); border-radius:var(--radius); overflow:hidden; background:var(--surface); }
-  .result-header { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; border-bottom:0.5px solid var(--border); background:var(--surface2); }
-  .result-name { font-size:14px; font-weight:500; }
-  .result-actions { display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end; }
-  .action-btn { font-size:12px; padding:5px 10px; border-radius:var(--radius-sm); border:0.5px solid var(--border); background:var(--surface); color:var(--muted); cursor:pointer; transition:all 0.12s; }
-  .action-btn:hover { border-color:var(--accent); color:var(--accent); }
-  .action-btn.saved { border-color:var(--success); color:var(--success); }
-  .action-btn.gmail { border-color:#4a90d9; color:#4a90d9; }
-  .result-body { padding:14px; font-family:'Courier New',monospace; font-size:11.5px; white-space:pre-wrap; line-height:1.65; color:#c8c4bc; max-height:280px; overflow-y:auto; }
-  .status-row { display:flex; align-items:center; gap:8px; padding:12px 14px; color:var(--muted); font-size:13px; }
-  .spinner { width:16px; height:16px; border:1.5px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin 0.7s linear infinite; flex-shrink:0; }
-  @keyframes spin { to { transform:rotate(360deg); } }
-  .toast { position:fixed; bottom:1.5rem; left:50%; transform:translateX(-50%); background:var(--surface2); border:0.5px solid var(--border); color:var(--text); padding:10px 18px; border-radius:999px; font-size:13px; opacity:0; transition:opacity 0.2s; pointer-events:none; white-space:nowrap; z-index:999; }
-  .toast.show { opacity:1; }
+/* Photo */
+.photo-zone { border: 0.5px dashed var(--border); border-radius: var(--radius); padding: 1.5rem 1rem; text-align: center; cursor: pointer; background: var(--surface); position: relative; transition: border-color 0.15s; }
+.photo-zone:hover { border-color: var(--accent); }
+.photo-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.photo-icon { font-size: 28px; margin-bottom: 6px; }
+.photo-text { font-size: 14px; font-weight: 500; }
+.photo-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+.thumbs { display: grid; grid-template-columns: repeat(4,1fr); gap: 6px; margin-top: 10px; }
+.thumb { aspect-ratio: 1; border-radius: var(--radius-sm); overflow: hidden; background: var(--surface2); position: relative; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; }
+.thumb-rm { position: absolute; top: 3px; right: 3px; width: 18px; height: 18px; background: rgba(0,0,0,0.7); border-radius: 50%; font-size: 10px; color: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+/* Inputs */
+textarea, .text-input { width: 100%; border-radius: var(--radius); border: 0.5px solid var(--border); padding: 12px 14px; font-size: 14px; font-family: inherit; color: var(--text); background: var(--surface); resize: none; line-height: 1.6; outline: none; transition: border-color 0.15s; }
+textarea:focus, .text-input:focus { border-color: var(--accent); }
+textarea::placeholder, .text-input::placeholder { color: var(--muted); }
+input.text-input { height: 46px; }
+
+/* Buttons */
+.btn-primary { width: 100%; padding: 15px; border-radius: var(--radius); border: none; background: var(--accent); color: #1a1400; font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
+.btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
+.btn-primary:not(:disabled):hover { opacity: 0.9; }
+.btn-secondary { width: 100%; padding: 12px; border-radius: var(--radius); border: 0.5px solid var(--border); background: var(--surface); color: var(--text); font-size: 14px; cursor: pointer; transition: background 0.15s; }
+.btn-secondary:hover { background: var(--surface2); }
+
+/* Voice button */
+.voice-btn { display: flex; align-items: center; gap: 8px; padding: 12px 14px; border-radius: var(--radius); border: 0.5px solid var(--border); background: var(--surface); color: var(--muted); font-size: 14px; cursor: pointer; width: 100%; transition: all 0.15s; }
+.voice-btn.recording { border-color: var(--danger); color: var(--danger); background: rgba(224,112,96,0.08); }
+.voice-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); flex-shrink: 0; }
+.voice-btn.recording .voice-dot { background: var(--danger); animation: pulse 1s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* Results */
+.result-card { border: 0.5px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--surface); }
+.result-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 0.5px solid var(--border); background: var(--surface2); }
+.result-name { font-size: 14px; font-weight: 500; }
+.result-actions { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.action-btn { font-size: 12px; padding: 5px 10px; border-radius: var(--radius-sm); border: 0.5px solid var(--border); background: var(--surface); color: var(--muted); cursor: pointer; transition: all 0.12s; }
+.action-btn:hover { border-color: var(--accent); color: var(--accent); }
+.action-btn.saved { border-color: var(--success); color: var(--success); }
+.result-body { padding: 14px; font-family: 'Courier New',monospace; font-size: 11.5px; white-space: pre-wrap; line-height: 1.65; color: #c8c4bc; max-height: 280px; overflow-y: auto; }
+.status-row { display: flex; align-items: center; gap: 8px; padding: 12px 14px; color: var(--muted); font-size: 13px; }
+.spinner { width: 16px; height: 16px; border: 1.5px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Search results */
+.person-list { display: flex; flex-direction: column; gap: 8px; }
+.person-item { padding: 12px 14px; border-radius: var(--radius); border: 0.5px solid var(--border); background: var(--surface); cursor: pointer; transition: border-color 0.15s; }
+.person-item:hover { border-color: var(--accent); }
+.person-item.selected { border-color: var(--accent); background: var(--accent-dim); }
+.person-name { font-size: 14px; font-weight: 500; }
+.person-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+/* List tab */
+.list-item { padding: 12px 14px; border-radius: var(--radius); border: 0.5px solid var(--border); background: var(--surface); display: flex; align-items: center; justify-content: space-between; }
+.list-info { flex: 1; }
+.list-name { font-size: 14px; font-weight: 500; }
+.list-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.list-flag { font-size: 11px; padding: 3px 8px; border-radius: 999px; border: 0.5px solid var(--border); color: var(--muted); }
+.list-flag.follow { border-color: var(--danger); color: var(--danger); background: rgba(224,112,96,0.1); }
+
+/* Toast */
+.toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); background: var(--surface2); border: 0.5px solid var(--border); color: var(--text); padding: 10px 18px; border-radius: 999px; font-size: 13px; opacity: 0; transition: opacity 0.2s; pointer-events: none; white-space: nowrap; z-index: 999; }
+.toast.show { opacity: 1; }
+
+/* Empty state */
+.empty { text-align: center; padding: 2rem 1rem; color: var(--muted); font-size: 14px; }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <div>
-    <div class="header-title">名刺キャプチャ</div>
-    <div class="header-date" id="headerDate"></div>
+  <div class="header-top">
+    <div>
+      <div class="header-title">名刺キャプチャ</div>
+      <div class="header-date" id="headerDate"></div>
+    </div>
+    <button class="drive-btn" id="driveBtn" onclick="toggleDrive()">
+      <span id="driveIcon">⬡</span>
+      <span id="driveLabel">Drive接続</span>
+    </button>
   </div>
-  <button class="drive-btn" id="driveBtn" onclick="toggleDrive()">
-    <span id="driveIcon">⬡</span>
-    <span id="driveLabel">Drive接続</span>
-  </button>
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('scan')">📷 スキャン</div>
+    <div class="tab" onclick="switchTab('memo')">📝 メモ追加</div>
+    <div class="tab" onclick="switchTab('list')">📋 一覧</div>
+  </div>
 </div>
 
 <div class="container">
 
-  <!-- API Key -->
-  <div>
-    <div class="section-label">Anthropic APIキー</div>
-    <div class="apikey-row">
-      <input type="password" id="apiKeyInput" placeholder="sk-ant-..." autocomplete="off">
-      <button class="apikey-save" onclick="saveApiKey()">保存</button>
+  <!-- TAB 1: SCAN -->
+  <div class="tab-content active" id="tab-scan">
+
+    <div>
+      <div class="section-label">Anthropic APIキー</div>
+      <div class="apikey-row">
+        <input type="password" id="apiKeyInput" placeholder="sk-ant-..." autocomplete="off">
+        <button class="apikey-save" onclick="saveApiKey()">保存</button>
+      </div>
+      <div class="apikey-status" id="apiKeyStatus">未設定（スキャンに必要です）</div>
     </div>
-    <div class="apikey-status" id="apiKeyStatus">未設定（スキャンに必要です）</div>
-  </div>
 
-  <!-- Photos -->
-  <div>
-    <div class="section-label">名刺写真（複数枚OK）</div>
-    <div class="photo-zone">
-      <input type="file" id="fileInput" accept="image/*" multiple onchange="handleFiles(this.files)">
-      <div class="photo-icon">🖼️</div>
-      <div class="photo-text">タップして写真を選択</div>
-      <div class="photo-sub">複数枚まとめてOK</div>
+    <div>
+      <div class="section-label">名刺写真（複数枚OK）</div>
+      <div class="photo-zone">
+        <input type="file" id="fileInput" accept="image/*" multiple onchange="handleFiles(this.files)">
+        <div class="photo-icon">🖼️</div>
+        <div class="photo-text">タップして写真を選択</div>
+        <div class="photo-sub">複数枚まとめてOK</div>
+      </div>
+      <div class="thumbs" id="thumbs"></div>
     </div>
-    <div class="thumbs" id="thumbs"></div>
+
+    <div>
+      <div class="section-label">イベント・場所</div>
+      <input type="text" class="text-input" id="contextInput" placeholder="例：JCC懇親会 バンコク">
+    </div>
+
+    <button class="btn-primary" id="submitBtn" onclick="startScan()" disabled>
+      スキャンして保存
+    </button>
+
+    <div id="resultsArea" style="display:flex;flex-direction:column;gap:16px;"></div>
+
   </div>
 
-  <!-- Context -->
-  <div>
-    <div class="section-label">イベント・場所</div>
-    <textarea id="contextInput" rows="2" style="min-height:52px;" placeholder="例：JCC懇親会 バンコク / Singularity Society勉強会"></textarea>
-  </div>
+  <!-- TAB 2: MEMO -->
+  <div class="tab-content" id="tab-memo">
 
-  <!-- Memo -->
-  <div>
-    <div class="section-label">会話メモ</div>
-    <textarea id="memoInput" rows="4" style="min-height:100px;" placeholder="会話の内容、印象、気になったこと...&#10;&#10;例：DX推進の予算が取れず困っている。来月セミナー企画中。日本語堪能で明るい性格。"></textarea>
-  </div>
+    <div>
+      <div class="section-label">人物を検索</div>
+      <input type="text" class="text-input" id="searchInput" placeholder="例：TDKの古賀さん、JCCの田中さん" oninput="searchPeople()">
+    </div>
 
-  <!-- Flags -->
-  <div>
-    <div class="section-label">フラグ</div>
-    <div class="flags-row">
-      <div class="flag-group">
-        <div class="flag-label">重要度</div>
-        <div class="chips">
-          <div class="chip" id="chip-high" onclick="setChip('importance','high')">🔴 高</div>
-          <div class="chip" id="chip-mid"  onclick="setChip('importance','mid')">🟡 中</div>
-          <div class="chip" id="chip-low"  onclick="setChip('importance','low')">⚪ 低</div>
+    <div id="searchResults" class="person-list"></div>
+
+    <div id="memoSection" style="display:none; flex-direction:column; gap:1rem;">
+      <div id="selectedPersonInfo" style="padding:12px 14px; background:var(--accent-dim); border-radius:var(--radius); border:0.5px solid var(--accent); font-size:14px;"></div>
+
+      <div>
+        <div class="section-label">メモを追加</div>
+        <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()">
+          <div class="voice-dot"></div>
+          <span id="voiceLabel">マイクで話す</span>
+        </button>
+        <textarea id="memoTextarea" style="margin-top:8px; min-height:120px;" placeholder="今日の会話内容、印象、気になったこと..."></textarea>
+      </div>
+
+      <div>
+        <div class="section-label">重要度・フォロー（任意）</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <select id="importanceSelect" style="flex:1;border-radius:var(--radius);border:0.5px solid var(--border);padding:10px 12px;font-size:14px;color:var(--text);background:var(--surface);outline:none;">
+            <option value="">重要度（変更なし）</option>
+            <option value="高">🔴 高</option>
+            <option value="中">🟡 中</option>
+            <option value="低">⚪ 低</option>
+          </select>
+          <select id="followSelect" style="flex:1;border-radius:var(--radius);border:0.5px solid var(--border);padding:10px 12px;font-size:14px;color:var(--text);background:var(--surface);outline:none;">
+            <option value="">フォロー要否（変更なし）</option>
+            <option value="YES">✅ 必要</option>
+            <option value="NO">— 不要</option>
+          </select>
         </div>
       </div>
-      <div class="flag-group">
-        <div class="flag-label">フォロー要否</div>
-        <div class="chips">
-          <div class="chip" id="chip-yes" onclick="setChip('follow','yes')">✅ 必要</div>
-          <div class="chip" id="chip-no"  onclick="setChip('follow','no')">— 不要</div>
-        </div>
-      </div>
+
+      <button class="btn-primary" id="saveMemoBtn" onclick="saveMemo()">メモを保存</button>
+      <button class="btn-secondary" onclick="clearMemoForm()">キャンセル</button>
     </div>
+
   </div>
 
-  <!-- Submit -->
-  <button class="submit-btn" id="submitBtn" onclick="startScan()" disabled>
-    スキャンして保存
-  </button>
-
-  <div id="resultsArea" style="display:flex;flex-direction:column;gap:16px;"></div>
+  <!-- TAB 3: LIST -->
+  <div class="tab-content" id="tab-list">
+    <button class="btn-secondary" onclick="loadList()">🔄 一覧を更新</button>
+    <div id="listArea" class="empty">Drive接続後に「一覧を更新」してください</div>
+  </div>
 
 </div>
 
@@ -176,19 +240,42 @@ const GOOGLE_CLIENT_ID = '1017711631388-9kqufvefuc041ajrg36ds70h5amqd3cv.apps.go
 const DRIVE_FOLDER_NAME = 'life/contacts/people';
 const SHEET_ID = '1oVg-SZZQd0u-IA_YMJHIKPkJy4NcH23P5cj5yDPiW80';
 
+// State
 const files = [];
 const results = [];
-const flags = { importance: 'mid', follow: 'no' };
 let accessToken = null;
 let driveFolderId = null;
 let anthropicKey = '';
+let recognition = null;
+let isRecording = false;
+let selectedPerson = null;
+let cachedPeople = [];
 
 // Init
 document.getElementById('headerDate').textContent = new Date().toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric',weekday:'short'});
-setChip('importance','mid');
-setChip('follow','no');
 
-// API Key
+// Load saved API key
+(function() {
+  const saved = localStorage.getItem('anthropic_key');
+  if (saved) {
+    anthropicKey = saved;
+    document.getElementById('apiKeyInput').value = saved;
+    document.getElementById('apiKeyStatus').textContent = '設定済み ✓ (長さ:' + saved.length + ')';
+    document.getElementById('apiKeyStatus').className = 'apikey-status ok';
+    updateSubmitBtn();
+  }
+})();
+
+// ── Tabs ──
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    t.classList.toggle('active', ['scan','memo','list'][i] === name);
+  });
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+// ── API Key ──
 function saveApiKey() {
   const val = document.getElementById('apiKeyInput').value.trim();
   if (!val || val.length < 20) {
@@ -197,7 +284,6 @@ function saveApiKey() {
     document.getElementById('apiKeyStatus').textContent = '未設定（スキャンに必要です）';
     document.getElementById('apiKeyStatus').className = 'apikey-status';
     updateSubmitBtn();
-    showToast('APIキーをクリアしました');
     return;
   }
   anthropicKey = val;
@@ -208,83 +294,68 @@ function saveApiKey() {
   showToast('APIキーを設定しました');
 }
 
-// Load saved API key on startup
-(function() {
-  const saved = localStorage.getItem('anthropic_key');
-  if (saved) {
-    anthropicKey = saved;
-    document.getElementById('apiKeyInput').value = saved;
-    document.getElementById('apiKeyStatus').textContent = '設定済み ✓';
-    document.getElementById('apiKeyStatus').className = 'apikey-status ok';
-  }
-})();
-
-// Photos
+// ── Photos ──
 async function handleFiles(newFiles) {
   for (const f of newFiles) {
     if (!f.type.startsWith('image/')) continue;
-    const arrayBuffer = await f.arrayBuffer();
-    const bytes = new Uint8Array(arrayBuffer);
-    let binary = '';
-    for (let j = 0; j < bytes.byteLength; j++) {
-      binary += String.fromCharCode(bytes[j]);
-    }
-    const base64 = btoa(binary);
-    files.push({ base64, mediaType: f.type || 'image/jpeg', name: f.name });
+    try {
+      const b64 = await readFileAsBase64(f);
+      const url = URL.createObjectURL(f);
+      files.push({ b64, mediaType: f.type || 'image/jpeg', name: f.name, url });
+    } catch(e) { showToast('画像読み込みエラー: ' + e.message); }
   }
   renderThumbs();
   updateSubmitBtn();
+}
+
+function readFileAsBase64(file) {
+  return new Promise((res, rej) => {
+    const arrayBuffer = file.arrayBuffer();
+    arrayBuffer.then(buffer => {
+      const bytes = new Uint8Array(buffer);
+      let binary = '';
+      const chunkSize = 8192;
+      for (let i = 0; i < bytes.byteLength; i += chunkSize) {
+        binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+      }
+      res(btoa(binary));
+    }).catch(rej);
+  });
 }
 
 function renderThumbs() {
   const el = document.getElementById('thumbs');
   el.innerHTML = '';
   files.forEach((f,i) => {
-    const url = `data:${f.mediaType};base64,${f.base64}`;
     const d = document.createElement('div');
     d.className = 'thumb';
-    d.innerHTML = `<img src="${url}"><button class="thumb-rm" onclick="removeFile(${i})">✕</button>`;
+    d.innerHTML = `<img src="${f.url}"><button class="thumb-rm" onclick="removeFile(${i})">✕</button>`;
     el.appendChild(d);
   });
 }
 
 function removeFile(i) { files.splice(i,1); renderThumbs(); updateSubmitBtn(); }
-
 function updateSubmitBtn() {
   document.getElementById('submitBtn').disabled = files.length === 0 || !anthropicKey;
 }
 
-// Flags
-function setChip(group, val) {
-  flags[group] = val;
-  const keys = group === 'importance' ? ['high','mid','low'] : ['yes','no'];
-  keys.forEach(k => {
-    const el = document.getElementById('chip-'+k);
-    if (!el) return;
-    el.className = 'chip' + (k === val ? ' active-'+k : '');
-  });
-}
-
-// Scan
-const importanceLabel = { high:'高', mid:'中', low:'低' };
-const followLabel = { yes:'YES', no:'NO' };
-
+// ── Scan ──
 const SYSTEM_PROMPT = `あなたは名刺のOCR・構造化アシスタントです。名刺画像を読み取り、指定のMarkdown形式のみを出力してください。日本語・英語・タイ語対応。読み取れない項目は「（不明）」。余分な説明文や前置きは不要。Markdownのみ出力。`;
 
-function buildPrompt(context, memo, importance, follow, today, followupDate) {
-  const memoLines = memo ? memo.split('\n').filter(l=>l.trim()).map(l=>'- '+l).join('\n') : '- （ここに後で追記）';
+function buildPrompt(context, today) {
+  const followupDate = addMonths(today, 3);
   return `名刺画像を読み取り、以下のフォーマットで出力してください：
 
 ---
 # [氏名]
 会社: [会社名] / 役職: [役職]
 出会い: ${today} / ${context || '（場所未記入）'}
-重要度: ${importanceLabel[importance]}
-フォロー要: ${followLabel[follow]}
+重要度: 中
+フォロー要: NO
 Eight: 未登録
 
 ## 会話メモ
-${memoLines}
+- （ここに後で追記）
 
 ## フォローアップ
 - [ ] （ここに後で追記）
@@ -311,9 +382,7 @@ function addMonths(dateStr, n) {
 
 async function startScan() {
   const context = document.getElementById('contextInput').value.trim();
-  const memo    = document.getElementById('memoInput').value.trim();
-  const today   = new Date().toISOString().split('T')[0];
-  const followupDate = addMonths(today, 3);
+  const today = new Date().toISOString().split('T')[0];
   const container = document.getElementById('resultsArea');
   container.innerHTML = '';
   results.length = 0;
@@ -326,10 +395,7 @@ async function startScan() {
     container.appendChild(loadDiv);
 
     try {
-      const b64 = files[i].base64;
-      const media = files[i].mediaType;
-      const prompt = buildPrompt(context, memo, flags.importance, flags.follow, today, followupDate);
-
+      const prompt = buildPrompt(context, today);
       const res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
@@ -343,8 +409,8 @@ async function startScan() {
           max_tokens: 1000,
           system: SYSTEM_PROMPT,
           messages: [{ role:'user', content:[
-            { type:'image', source:{ type:'base64', media_type:media, data:b64 } },
-            { type:'text', text:prompt }
+            { type:'image', source:{ type:'base64', media_type: files[i].mediaType, data: files[i].b64 } },
+            { type:'text', text: prompt }
           ]}]
         })
       });
@@ -352,7 +418,7 @@ async function startScan() {
       const data = await res.json();
       if (data.error) throw new Error(data.error.type + ': ' + data.error.message);
       if (!data.content) throw new Error('レスポンス異常: ' + JSON.stringify(data).slice(0,100));
-      const md = (data.content||[]).map(b=>b.text||'').join('').trim();
+      const md = data.content.map(b=>b.text||'').join('').trim();
       const nameMatch = md.match(/^# (.+)/m);
       const name = nameMatch ? nameMatch[1].trim() : `名刺${i+1}`;
       const filename = name.replace(/[^\w\u3040-\u9FFF\u30A0-\u30FF\u4E00-\u9FFF]/g,'_') + '.md';
@@ -364,7 +430,6 @@ async function startScan() {
           <div class="result-actions">
             <button class="action-btn" onclick="copyMd(${i})">コピー</button>
             <button class="action-btn" id="saveBtn-${i}" onclick="saveToDrive(${i})">${accessToken?'Drive保存':'DL'}</button>
-            <button class="action-btn gmail" id="gmailBtn-${i}" onclick="createGmailDraft(${i})">Gmail下書き</button>
           </div>
         </div>
         <div class="result-body">${escHtml(md)}</div>`;
@@ -379,7 +444,7 @@ async function startScan() {
   document.getElementById('submitBtn').disabled = false;
 }
 
-// Google Drive
+// ── Google Drive ──
 function toggleDrive() {
   if (accessToken) {
     accessToken = null; driveFolderId = null;
@@ -440,7 +505,8 @@ async function saveToDrive(i) {
     });
     btn.textContent = '保存済 ✓'; btn.classList.add('saved');
     await saveToSheet(results[i].md, document.getElementById('contextInput').value.trim());
-    showToast(`${results[i].name} をDrive＋スプレッドシートに保存しました`);
+    showToast(`${results[i].name} を保存しました`);
+    cachedPeople = [];
   } catch(e) {
     btn.textContent = 'Drive保存';
     showToast('保存エラー: '+e.message);
@@ -454,25 +520,18 @@ function downloadMd(i) {
   a.download = filename; a.click();
 }
 
-// ════════════════════════════════════════════
-//  Google Sheets
-// ════════════════════════════════════════════
+// ── Google Sheets ──
 async function ensureSheetHeader() {
   try {
-    const res = await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/A1:H1`,
-      { headers: { Authorization: `Bearer ${accessToken}` } }
-    );
+    const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/A1:H1`,
+      { headers: { Authorization: `Bearer ${accessToken}` } });
     const data = await res.json();
     if (!data.values || data.values.length === 0) {
-      await fetch(
-        `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/A1:H1?valueInputOption=RAW`,
-        {
-          method: 'PUT',
-          headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ values: [['日付','氏名','会社','役職','重要度','フォロー要否','イベント','会話メモ']] })
-        }
-      );
+      await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/A1:H1?valueInputOption=RAW`,{
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ values: [['日付','氏名','会社','役職','重要度','フォロー要否','イベント','会話メモ']] })
+      });
     }
   } catch(e) { console.error('Sheet header error:', e); }
 }
@@ -486,121 +545,243 @@ async function saveToSheet(md, context) {
     const followMatch= md.match(/フォロー要: ([^\n]+)/);
     const memoMatch  = md.match(/## 会話メモ\n([\s\S]*?)\n##/);
     const today      = new Date().toISOString().split('T')[0];
-
     const name   = nameMatch   ? nameMatch[1].trim()   : '';
     const comp   = compMatch   ? compMatch[1].trim()   : '';
     const role   = roleMatch   ? roleMatch[1].trim()   : '';
     const imp    = impMatch    ? impMatch[1].trim()    : '';
     const follow = followMatch ? followMatch[1].trim() : '';
     const memo   = memoMatch   ? memoMatch[1].replace(/^- /gm,'').replace(/\n/g,' ').trim().slice(0,100) : '';
-
-    await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/A:H:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`,
-      {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ values: [[today, name, comp, role, imp, follow, context, memo]] })
-      }
-    );
+    await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/A:H:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`,{
+      method: 'POST',
+      headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ values: [[today, name, comp, role, imp, follow, context, memo]] })
+    });
   } catch(e) { console.error('Sheet save error:', e); }
 }
 
-// Gmail draft
-async function createGmailDraft(i) {
-  const btn = document.getElementById('gmailBtn-'+i);
-  btn.textContent = '作成中...'; btn.disabled = true;
-  const { name, md } = results[i];
-  const today = new Date().toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric'});
-  const prompt = `以下は今日出会った方の名刺情報と会話メモです。翌朝送る簡潔な日本語のお礼・挨拶メールの下書きを作ってください。
+// ── Memo Tab ──
+async function searchPeople() {
+  const query = document.getElementById('searchInput').value.trim();
+  if (!query || query.length < 2) {
+    document.getElementById('searchResults').innerHTML = '';
+    return;
+  }
+  if (!accessToken) { showToast('まずDriveに接続してください'); return; }
 
-条件：
-- 送信者：Jack Nakamura（HR consultant / Asian Identity）
-- 件名と本文を作成すること
-- 自然で温かみがある文体、3〜4段落程度
-- 会話メモの内容を1〜2箇所さりげなく盛り込む
-- 日本語で書く
+  // Load people list if not cached
+  if (cachedPeople.length === 0) await loadPeopleCache();
 
-名刺・会話情報：
-${md}
+  const lower = query.toLowerCase();
+  const matched = cachedPeople.filter(p =>
+    p.name.toLowerCase().includes(lower) ||
+    p.company.toLowerCase().includes(lower)
+  );
 
-本日の日付：${today}
+  const container = document.getElementById('searchResults');
+  if (matched.length === 0) {
+    container.innerHTML = '<div class="empty">見つかりませんでした</div>';
+    return;
+  }
 
-件名と本文のみ出力してください。`;
+  container.innerHTML = matched.slice(0,5).map((p,i) => `
+    <div class="person-item" onclick="selectPerson(${cachedPeople.indexOf(p)})">
+      <div class="person-name">${escHtml(p.name)}</div>
+      <div class="person-sub">${escHtml(p.company)} / ${escHtml(p.date)}</div>
+    </div>`).join('');
+}
+
+async function loadPeopleCache() {
+  try {
+    if (!driveFolderId) driveFolderId = await ensureFolder(DRIVE_FOLDER_NAME);
+    const res = await gapiReq(`https://www.googleapis.com/drive/v3/files?q='${driveFolderId}' in parents and mimeType='text/markdown' and trashed=false&fields=files(id,name)&orderBy=createdTime desc&pageSize=100`);
+    cachedPeople = (res.files || []).map(f => {
+      const name = f.name.replace('.md','').replace(/_/g,' ');
+      return { id: f.id, name, company: '', date: '', filename: f.name };
+    });
+  } catch(e) { showToast('ファイル一覧の取得に失敗しました'); }
+}
+
+async function selectPerson(index) {
+  selectedPerson = cachedPeople[index];
+  document.querySelectorAll('.person-item').forEach((el,i) => {
+    el.classList.toggle('selected', i === index);
+  });
+
+  // Load file content to get company info
+  try {
+    const res = await fetch(`https://www.googleapis.com/drive/v3/files/${selectedPerson.id}?alt=media`,
+      { headers: { Authorization: `Bearer ${accessToken}` } });
+    const content = await res.text();
+    selectedPerson.content = content;
+    const compMatch = content.match(/会社: ([^/\n]+)/);
+    const dateMatch = content.match(/出会い: ([^\s]+)/);
+    selectedPerson.company = compMatch ? compMatch[1].trim() : '';
+    selectedPerson.date = dateMatch ? dateMatch[1].trim() : '';
+  } catch(e) {}
+
+  document.getElementById('selectedPersonInfo').innerHTML =
+    `<strong>${escHtml(selectedPerson.name)}</strong><br>
+     <span style="font-size:12px;color:var(--muted)">${escHtml(selectedPerson.company)} / ${escHtml(selectedPerson.date)}</span>`;
+  document.getElementById('memoSection').style.display = 'flex';
+  document.getElementById('memoTextarea').value = '';
+  document.getElementById('importanceSelect').value = '';
+  document.getElementById('followSelect').value = '';
+}
+
+async function saveMemo() {
+  if (!selectedPerson) return;
+  const memo = document.getElementById('memoTextarea').value.trim();
+  const importance = document.getElementById('importanceSelect').value;
+  const follow = document.getElementById('followSelect').value;
+
+  if (!memo && !importance && !follow) {
+    showToast('メモを入力してください');
+    return;
+  }
+
+  const btn = document.getElementById('saveMemoBtn');
+  btn.textContent = '保存中...';
+  btn.disabled = true;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'x-api-key': anthropicKey,
-        'anthropic-version':'2023-06-01',
-        'anthropic-dangerous-direct-browser-access':'true'
-      },
-      body: JSON.stringify({
-        model:'claude-haiku-4-5-20251001',
-        max_tokens:1000,
-        messages:[{role:'user',content:prompt}]
-      })
+    const today = new Date().toISOString().split('T')[0];
+    let content = selectedPerson.content || '';
+
+    // Add memo to 会話メモ section
+    if (memo) {
+      const memoLines = memo.split('\n').filter(l=>l.trim()).map(l=>`- [${today}] ${l}`).join('\n');
+      if (content.includes('## 会話メモ')) {
+        content = content.replace('- （ここに後で追記）', '');
+        content = content.replace('## 会話メモ\n', `## 会話メモ\n${memoLines}\n`);
+      }
+    }
+
+    // Update importance
+    if (importance) {
+      content = content.replace(/重要度: .+/, `重要度: ${importance}`);
+    }
+
+    // Update follow
+    if (follow) {
+      content = content.replace(/フォロー要: .+/, `フォロー要: ${follow}`);
+    }
+
+    // Add to 連絡履歴
+    if (memo) {
+      const historyEntry = `- ${today}: メモ追加`;
+      content = content.replace('## 連絡履歴\n', `## 連絡履歴\n${historyEntry}\n`);
+    }
+
+    // Save back to Drive
+    await fetch(`https://www.googleapis.com/upload/drive/v3/files/${selectedPerson.id}?uploadType=media`,{
+      method: 'PATCH',
+      headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'text/markdown' },
+      body: content
     });
-    const data = await res.json();
-    if (data.error) throw new Error(data.error.message);
-    const text = (data.content||[]).map(b=>b.text||'').join('');
 
-    // Extract subject and body
-    const subjectMatch = text.match(/件名[:：]\s*(.+)/);
-    const subject = subjectMatch ? subjectMatch[1].trim() : `ご挨拶 - ${name}`;
-    const body = text.replace(/件名[:：].+\n?/,'').trim();
+    // Update sheet memo column
+    if (memo) await updateSheetMemo(selectedPerson.name, memo, today);
 
-    // Get recipient email from md
-    const emailMatch = md.match(/Email[:：]\s*([^\n]+)/);
-    const to = emailMatch && !emailMatch[1].includes('不明') ? emailMatch[1].trim() : '';
-
-    // Create Gmail draft via mailto (fallback) or show the draft
-    showDraftModal(name, to, subject, body, i);
-    btn.textContent = '下書き完了 ✓'; btn.classList.add('saved');
+    showToast(`${selectedPerson.name} のメモを保存しました`);
+    clearMemoForm();
   } catch(e) {
-    btn.textContent = 'Gmail下書き'; btn.disabled = false;
-    showToast('エラー: '+e.message);
+    showToast('保存エラー: ' + e.message);
+  } finally {
+    btn.textContent = 'メモを保存';
+    btn.disabled = false;
   }
 }
 
-function showDraftModal(name, to, subject, body, i) {
-  const existing = document.getElementById('draftModal');
-  if (existing) existing.remove();
-
-  const modal = document.createElement('div');
-  modal.id = 'draftModal';
-  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;display:flex;align-items:flex-end;padding:0;';
-  modal.innerHTML = `
-    <div style="background:var(--surface);width:100%;border-radius:16px 16px 0 0;padding:1.5rem;max-height:85vh;overflow-y:auto;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-        <div style="font-size:15px;font-weight:600;">${escHtml(name)} へのメール下書き</div>
-        <button onclick="document.getElementById('draftModal').remove()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;">✕</button>
-      </div>
-      <div style="font-size:12px;color:var(--muted);margin-bottom:4px;">件名</div>
-      <div style="background:var(--surface2);border-radius:8px;padding:10px 12px;font-size:14px;margin-bottom:12px;">${escHtml(subject)}</div>
-      <div style="font-size:12px;color:var(--muted);margin-bottom:4px;">本文</div>
-      <div style="background:var(--surface2);border-radius:8px;padding:10px 12px;font-size:13px;line-height:1.7;white-space:pre-wrap;margin-bottom:16px;">${escHtml(body)}</div>
-      <div style="display:flex;gap:8px;">
-        <button onclick="copyDraft('${escHtml(subject)}','${escHtml(body)}')" style="flex:1;padding:12px;border-radius:10px;border:0.5px solid var(--border);background:var(--surface2);color:var(--text);font-size:14px;cursor:pointer;">本文をコピー</button>
-        <a href="mailto:${escHtml(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}" style="flex:1;padding:12px;border-radius:10px;border:none;background:var(--accent);color:#1a1400;font-size:14px;cursor:pointer;text-align:center;text-decoration:none;font-weight:600;display:block;line-height:1.4;">メールアプリで開く</button>
-      </div>
-    </div>`;
-  document.body.appendChild(modal);
-  modal.addEventListener('click', e => { if(e.target===modal) modal.remove(); });
+async function updateSheetMemo(name, memo, date) {
+  try {
+    const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/A:H`,
+      { headers: { Authorization: `Bearer ${accessToken}` } });
+    const data = await res.json();
+    const rows = data.values || [];
+    const rowIndex = rows.findIndex((r,i) => i > 0 && r[1] && r[1].includes(name.split('（')[0].trim()));
+    if (rowIndex > 0) {
+      const currentMemo = rows[rowIndex][7] || '';
+      const newMemo = currentMemo ? currentMemo + ' | ' + memo.slice(0,50) : memo.slice(0,50);
+      await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/H${rowIndex+1}?valueInputOption=RAW`,{
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ values: [[newMemo]] })
+      });
+    }
+  } catch(e) { console.error('Sheet memo update error:', e); }
 }
 
-function copyDraft(subject, body) {
-  navigator.clipboard.writeText(`件名: ${subject}\n\n${body}`).then(()=>showToast('クリップボードにコピーしました'));
+function clearMemoForm() {
+  selectedPerson = null;
+  document.getElementById('searchInput').value = '';
+  document.getElementById('searchResults').innerHTML = '';
+  document.getElementById('memoSection').style.display = 'none';
+  document.getElementById('memoTextarea').value = '';
 }
 
-// Utils
+// ── Voice ──
+function toggleVoice() {
+  if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+    showToast('このブラウザは音声入力非対応です');
+    return;
+  }
+  if (isRecording) { recognition.stop(); return; }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.lang = 'ja-JP';
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  const base = document.getElementById('memoTextarea').value;
+  recognition.onresult = e => {
+    let interim = '', final = base;
+    for (const r of e.results) {
+      if (r.isFinal) final += r[0].transcript;
+      else interim += r[0].transcript;
+    }
+    document.getElementById('memoTextarea').value = final + interim;
+  };
+  recognition.onend = () => setRecording(false);
+  recognition.start();
+  setRecording(true);
+}
+
+function setRecording(v) {
+  isRecording = v;
+  const btn = document.getElementById('voiceBtn');
+  btn.classList.toggle('recording', v);
+  document.getElementById('voiceLabel').textContent = v ? '録音中… タップで停止' : 'マイクで話す';
+}
+
+// ── List Tab ──
+async function loadList() {
+  if (!accessToken) { showToast('まずDriveに接続してください'); return; }
+  const area = document.getElementById('listArea');
+  area.innerHTML = '<div class="empty">読み込み中...</div>';
+  try {
+    const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/A:H`,
+      { headers: { Authorization: `Bearer ${accessToken}` } });
+    const data = await res.json();
+    const rows = (data.values || []).slice(1).filter(r => r[1]);
+    if (rows.length === 0) { area.innerHTML = '<div class="empty">データがありません</div>'; return; }
+    area.innerHTML = '<div style="display:flex;flex-direction:column;gap:8px;">' +
+      rows.reverse().map(r => `
+        <div class="list-item">
+          <div class="list-info">
+            <div class="list-name">${escHtml(r[1]||'')}</div>
+            <div class="list-sub">${escHtml(r[2]||'')} / ${escHtml(r[0]||'')}</div>
+          </div>
+          <div class="list-flag ${r[5]==='YES'?'follow':''}">${r[5]==='YES'?'フォロー要':'　'}</div>
+        </div>`).join('') + '</div>';
+  } catch(e) { area.innerHTML = '<div class="empty">読み込みエラー: ' + escHtml(e.message) + '</div>'; }
+}
+
+// ── Utils ──
 function copyMd(i) {
-  navigator.clipboard.writeText(results[i].md).then(()=>showToast('クリップボードにコピーしました'));
+  navigator.clipboard.writeText(results[i].md).then(()=>showToast('コピーしました'));
 }
 
 function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 let toastTimer;
