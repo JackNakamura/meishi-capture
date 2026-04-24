@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>名刺キャプチャ</title>
+<title>名刺フォロー</title>
 <script src="https://accounts.google.com/gsi/client" async></script>
 <style>
 :root {
@@ -53,18 +53,6 @@ body { background: var(--bg); color: var(--text); font-family: -apple-system,'Hi
 .apikey-status { font-size: 12px; color: var(--muted); margin-top: 4px; }
 .apikey-status.ok { color: var(--success); }
 
-/* Photo */
-.photo-zone { border: 0.5px dashed var(--border); border-radius: var(--radius); padding: 1.5rem 1rem; text-align: center; cursor: pointer; background: var(--surface); position: relative; transition: border-color 0.15s; }
-.photo-zone:hover { border-color: var(--accent); }
-.photo-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-.photo-icon { font-size: 28px; margin-bottom: 6px; }
-.photo-text { font-size: 14px; font-weight: 500; }
-.photo-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
-.thumbs { display: grid; grid-template-columns: repeat(4,1fr); gap: 6px; margin-top: 10px; }
-.thumb { aspect-ratio: 1; border-radius: var(--radius-sm); overflow: hidden; background: var(--surface2); position: relative; }
-.thumb img { width: 100%; height: 100%; object-fit: cover; }
-.thumb-rm { position: absolute; top: 3px; right: 3px; width: 18px; height: 18px; background: rgba(0,0,0,0.7); border-radius: 50%; font-size: 10px; color: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-
 /* Inputs */
 textarea, .text-input { width: 100%; border-radius: var(--radius); border: 0.5px solid var(--border); padding: 12px 14px; font-size: 14px; font-family: inherit; color: var(--text); background: var(--surface); resize: none; line-height: 1.6; outline: none; transition: border-color 0.15s; }
 textarea:focus, .text-input:focus { border-color: var(--accent); }
@@ -77,6 +65,7 @@ input.text-input { height: 46px; }
 .btn-primary:not(:disabled):hover { opacity: 0.9; }
 .btn-secondary { width: 100%; padding: 12px; border-radius: var(--radius); border: 0.5px solid var(--border); background: var(--surface); color: var(--text); font-size: 14px; cursor: pointer; transition: background 0.15s; }
 .btn-secondary:hover { background: var(--surface2); }
+.btn-secondary:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* Voice button */
 .voice-btn { display: flex; align-items: center; gap: 8px; padding: 12px 14px; border-radius: var(--radius); border: 0.5px solid var(--border); background: var(--surface); color: var(--muted); font-size: 14px; cursor: pointer; width: 100%; transition: all 0.15s; }
@@ -90,36 +79,29 @@ input.text-input { height: 46px; }
 .result-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 0.5px solid var(--border); background: var(--surface2); }
 .result-name { font-size: 14px; font-weight: 500; }
 .result-actions { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
-.action-btn { font-size: 12px; padding: 5px 10px; border-radius: var(--radius-sm); border: 0.5px solid var(--border); background: var(--surface); color: var(--muted); cursor: pointer; transition: all 0.12s; }
+.action-btn { font-size: 12px; padding: 5px 10px; border-radius: var(--radius-sm); border: 0.5px solid var(--border); background: var(--surface); color: var(--muted); cursor: pointer; text-decoration: none; transition: all 0.12s; }
 .action-btn:hover { border-color: var(--accent); color: var(--accent); }
 .action-btn.saved { border-color: var(--success); color: var(--success); }
-.result-body { padding: 14px; font-family: 'Courier New',monospace; font-size: 11.5px; white-space: pre-wrap; line-height: 1.65; color: #c8c4bc; max-height: 280px; overflow-y: auto; }
-.status-row { display: flex; align-items: center; gap: 8px; padding: 12px 14px; color: var(--muted); font-size: 13px; }
-.spinner { width: 16px; height: 16px; border: 1.5px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
+.result-body { padding: 14px; font-family: 'Courier New',monospace; font-size: 11.5px; white-space: pre-wrap; line-height: 1.65; color: #c8c4bc; max-height: 320px; overflow-y: auto; }
+.spinner { width: 16px; height: 16px; border: 1.5px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; display: inline-block; vertical-align: middle; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* Search results */
 .person-list { display: flex; flex-direction: column; gap: 8px; }
 .person-item { padding: 12px 14px; border-radius: var(--radius); border: 0.5px solid var(--border); background: var(--surface); cursor: pointer; transition: border-color 0.15s; }
 .person-item:hover { border-color: var(--accent); }
-.person-item.selected { border-color: var(--accent); background: var(--accent-dim); }
 .person-name { font-size: 14px; font-weight: 500; }
 .person-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
-
-/* List tab */
-.list-item { padding: 12px 14px; border-radius: var(--radius); border: 0.5px solid var(--border); background: var(--surface); display: flex; align-items: center; justify-content: space-between; }
-.list-info { flex: 1; }
-.list-name { font-size: 14px; font-weight: 500; }
-.list-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
-.list-flag { font-size: 11px; padding: 3px 8px; border-radius: 999px; border: 0.5px solid var(--border); color: var(--muted); }
-.list-flag.follow { border-color: var(--danger); color: var(--danger); background: rgba(224,112,96,0.1); }
 
 /* Toast */
 .toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); background: var(--surface2); border: 0.5px solid var(--border); color: var(--text); padding: 10px 18px; border-radius: 999px; font-size: 13px; opacity: 0; transition: opacity 0.2s; pointer-events: none; white-space: nowrap; z-index: 999; }
 .toast.show { opacity: 1; }
 
 /* Empty state */
-.empty { text-align: center; padding: 2rem 1rem; color: var(--muted); font-size: 14px; }
+.empty { text-align: center; padding: 2rem 1rem; color: var(--muted); font-size: 14px; line-height: 1.8; }
+
+/* Select */
+select { border-radius: var(--radius); border: 0.5px solid var(--border); padding: 10px 12px; font-size: 14px; color: var(--text); background: var(--surface); outline: none; }
 </style>
 </head>
 <body>
@@ -127,91 +109,67 @@ input.text-input { height: 46px; }
 <div class="header">
   <div class="header-top">
     <div>
-      <div class="header-title">名刺キャプチャ</div>
+      <div class="header-title">名刺フォロー</div>
       <div class="header-date" id="headerDate"></div>
     </div>
     <button class="drive-btn" id="driveBtn" onclick="toggleDrive()">
       <span id="driveIcon">⬡</span>
-      <span id="driveLabel">Drive接続</span>
+      <span id="driveLabel">Drive/Gmail接続</span>
     </button>
   </div>
   <div class="tabs">
-    <div class="tab active" onclick="switchTab('scan')">📷 スキャン</div>
-    <div class="tab" onclick="switchTab('memo')">📝 メモ追加</div>
-    <div class="tab" onclick="switchTab('list')">📋 一覧</div>
+    <div class="tab active" onclick="switchTab('main')">📝 メモ & メール</div>
+    <div class="tab" onclick="switchTab('followup')">⏰ フォロー</div>
   </div>
 </div>
 
 <div class="container">
 
-  <!-- TAB 1: SCAN -->
-  <div class="tab-content active" id="tab-scan">
+  <!-- TAB: MAIN -->
+  <div class="tab-content active" id="tab-main">
 
     <div>
-      <div class="section-label">Anthropic APIキー</div>
+      <div class="section-label">Anthropic APIキー（メール生成に使用）</div>
       <div class="apikey-row">
         <input type="password" id="apiKeyInput" placeholder="sk-ant-..." autocomplete="off">
         <button class="apikey-save" onclick="saveApiKey()">保存</button>
       </div>
-      <div class="apikey-status" id="apiKeyStatus">未設定（スキャンに必要です）</div>
+      <div class="apikey-status" id="apiKeyStatus">未設定</div>
     </div>
 
     <div>
-      <div class="section-label">名刺写真（複数枚OK）</div>
-      <div class="photo-zone">
-        <input type="file" id="fileInput" accept="image/*" multiple onchange="handleFiles(this.files)">
-        <div class="photo-icon">🖼️</div>
-        <div class="photo-text">タップして写真を選択</div>
-        <div class="photo-sub">複数枚まとめてOK</div>
-      </div>
-      <div class="thumbs" id="thumbs"></div>
+      <div class="section-label">相手を検索（氏名・会社名）</div>
+      <input type="text" class="text-input" id="searchInput" placeholder="例：TDK、古賀、JCC、ABE TOSHIYUKI" oninput="searchPeople()">
+      <div id="searchResults" class="person-list" style="margin-top:8px;"></div>
     </div>
 
-    <div>
-      <div class="section-label">イベント・場所</div>
-      <input type="text" class="text-input" id="contextInput" placeholder="例：JCC懇親会 バンコク">
-    </div>
-
-    <button class="btn-primary" id="submitBtn" onclick="startScan()" disabled>
-      スキャンして保存
-    </button>
-
-    <div id="resultsArea" style="display:flex;flex-direction:column;gap:16px;"></div>
-
-  </div>
-
-  <!-- TAB 2: MEMO -->
-  <div class="tab-content" id="tab-memo">
-
-    <div>
-      <div class="section-label">人物を検索</div>
-      <input type="text" class="text-input" id="searchInput" placeholder="例：TDKの古賀さん、JCCの田中さん" oninput="searchPeople()">
-    </div>
-
-    <div id="searchResults" class="person-list"></div>
-
-    <div id="memoSection" style="display:none; flex-direction:column; gap:1rem;">
-      <div id="selectedPersonInfo" style="padding:12px 14px; background:var(--accent-dim); border-radius:var(--radius); border:0.5px solid var(--accent); font-size:14px;"></div>
+    <div id="personSection" style="display:none; flex-direction:column; gap:1rem;">
+      <div id="selectedPersonInfo" style="padding:12px 14px; background:var(--accent-dim); border-radius:var(--radius); border:0.5px solid var(--accent);"></div>
 
       <div>
-        <div class="section-label">メモを追加</div>
+        <div class="section-label">会話メモ</div>
         <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()">
           <div class="voice-dot"></div>
           <span id="voiceLabel">マイクで話す</span>
         </button>
-        <textarea id="memoTextarea" style="margin-top:8px; min-height:120px;" placeholder="今日の会話内容、印象、気になったこと..."></textarea>
+        <textarea id="memoTextarea" style="margin-top:8px; min-height:100px;" placeholder="今日の会話・印象・気になったこと..."></textarea>
       </div>
 
       <div>
-        <div class="section-label">重要度・フォロー（任意）</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <select id="importanceSelect" style="flex:1;border-radius:var(--radius);border:0.5px solid var(--border);padding:10px 12px;font-size:14px;color:var(--text);background:var(--surface);outline:none;">
+        <div class="section-label">きっかけ・場所（メール生成に利用）</div>
+        <input type="text" class="text-input" id="contextInput" placeholder="例：JCC懇親会、XX氏のご紹介、HRセミナー">
+      </div>
+
+      <div>
+        <div class="section-label">ステータス（任意）</div>
+        <div style="display:flex;gap:8px;">
+          <select id="importanceSelect" style="flex:1;">
             <option value="">重要度（変更なし）</option>
             <option value="高">🔴 高</option>
             <option value="中">🟡 中</option>
             <option value="低">⚪ 低</option>
           </select>
-          <select id="followSelect" style="flex:1;border-radius:var(--radius);border:0.5px solid var(--border);padding:10px 12px;font-size:14px;color:var(--text);background:var(--surface);outline:none;">
+          <select id="followSelect" style="flex:1;">
             <option value="">フォロー要否（変更なし）</option>
             <option value="YES">✅ 必要</option>
             <option value="NO">— 不要</option>
@@ -219,16 +177,22 @@ input.text-input { height: 46px; }
         </div>
       </div>
 
-      <button class="btn-primary" id="saveMemoBtn" onclick="saveMemo()">メモを保存</button>
-      <button class="btn-secondary" onclick="clearMemoForm()">キャンセル</button>
+      <button class="btn-primary" id="generateEmailBtn" onclick="saveAndGenerateEmail()">📧 Gmail下書き + メモ保存</button>
+      <button class="btn-secondary" id="saveMemoOnlyBtn" onclick="saveMemoOnly()">メモのみ保存</button>
+      <button class="btn-secondary" onclick="clearPersonForm()">キャンセル</button>
+
+      <div id="draftPreview" style="display:none;"></div>
     </div>
 
   </div>
 
-  <!-- TAB 3: LIST -->
-  <div class="tab-content" id="tab-list">
-    <button class="btn-secondary" onclick="loadList()">🔄 一覧を更新</button>
-    <div id="listArea" class="empty">Drive接続後に「一覧を更新」してください</div>
+  <!-- TAB: FOLLOWUP -->
+  <div class="tab-content" id="tab-followup">
+    <div class="empty">
+      ⏰ フォローアップ機能<br><br>
+      次回連絡目安が近い人を自動抽出する機能は<br>
+      Phase 2 で実装予定です。
+    </div>
   </div>
 
 </div>
@@ -240,9 +204,14 @@ const GOOGLE_CLIENT_ID = '1017711631388-9kqufvefuc041ajrg36ds70h5amqd3cv.apps.go
 const DRIVE_FOLDER_NAME = 'life/contacts/people';
 const SHEET_ID = '1oVg-SZZQd0u-IA_YMJHIKPkJy4NcH23P5cj5yDPiW80';
 
+const SIGNATURE = `--
+Jack Nakamura (中村 勝宏)
+Asian Identity Co., Ltd. | 代表 / HRコンサルタント
+Bangkok, Thailand
+Web: http://asian-identity.com/
+Tel: +66-2-115-9655`;
+
 // State
-const files = [];
-const results = [];
 let accessToken = null;
 let driveFolderId = null;
 let anthropicKey = '';
@@ -254,22 +223,20 @@ let cachedPeople = [];
 // Init
 document.getElementById('headerDate').textContent = new Date().toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric',weekday:'short'});
 
-// Load saved API key
 (function() {
   const saved = localStorage.getItem('anthropic_key');
   if (saved) {
     anthropicKey = saved;
     document.getElementById('apiKeyInput').value = saved;
-    document.getElementById('apiKeyStatus').textContent = '設定済み ✓ (長さ:' + saved.length + ')';
+    document.getElementById('apiKeyStatus').textContent = '設定済み ✓';
     document.getElementById('apiKeyStatus').className = 'apikey-status ok';
-    updateSubmitBtn();
   }
 })();
 
 // ── Tabs ──
 function switchTab(name) {
   document.querySelectorAll('.tab').forEach((t,i) => {
-    t.classList.toggle('active', ['scan','memo','list'][i] === name);
+    t.classList.toggle('active', ['main','followup'][i] === name);
   });
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
@@ -281,188 +248,37 @@ function saveApiKey() {
   if (!val || val.length < 20) {
     anthropicKey = '';
     localStorage.removeItem('anthropic_key');
-    document.getElementById('apiKeyStatus').textContent = '未設定（スキャンに必要です）';
+    document.getElementById('apiKeyStatus').textContent = '未設定';
     document.getElementById('apiKeyStatus').className = 'apikey-status';
-    updateSubmitBtn();
     return;
   }
   anthropicKey = val;
   localStorage.setItem('anthropic_key', val);
-  document.getElementById('apiKeyStatus').textContent = '設定済み ✓ (長さ:' + val.length + ')';
+  document.getElementById('apiKeyStatus').textContent = '設定済み ✓';
   document.getElementById('apiKeyStatus').className = 'apikey-status ok';
-  updateSubmitBtn();
-  showToast('APIキーを設定しました');
+  showToast('APIキーを保存しました');
 }
 
-// ── Photos ──
-async function handleFiles(newFiles) {
-  for (const f of newFiles) {
-    if (!f.type.startsWith('image/')) continue;
-    try {
-      const b64 = await readFileAsBase64(f);
-      const url = URL.createObjectURL(f);
-      files.push({ b64, mediaType: f.type || 'image/jpeg', name: f.name, url });
-    } catch(e) { showToast('画像読み込みエラー: ' + e.message); }
-  }
-  renderThumbs();
-  updateSubmitBtn();
-}
-
-function readFileAsBase64(file) {
-  return new Promise((res, rej) => {
-    const arrayBuffer = file.arrayBuffer();
-    arrayBuffer.then(buffer => {
-      const bytes = new Uint8Array(buffer);
-      let binary = '';
-      const chunkSize = 8192;
-      for (let i = 0; i < bytes.byteLength; i += chunkSize) {
-        binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
-      }
-      res(btoa(binary));
-    }).catch(rej);
-  });
-}
-
-function renderThumbs() {
-  const el = document.getElementById('thumbs');
-  el.innerHTML = '';
-  files.forEach((f,i) => {
-    const d = document.createElement('div');
-    d.className = 'thumb';
-    d.innerHTML = `<img src="${f.url}"><button class="thumb-rm" onclick="removeFile(${i})">✕</button>`;
-    el.appendChild(d);
-  });
-}
-
-function removeFile(i) { files.splice(i,1); renderThumbs(); updateSubmitBtn(); }
-function updateSubmitBtn() {
-  document.getElementById('submitBtn').disabled = files.length === 0 || !anthropicKey;
-}
-
-// ── Scan ──
-const SYSTEM_PROMPT = 'あなたは名刺のOCR・構造化アシスタントです。名刺画像を読み取り、指定のMarkdown形式のみを出力してください。日本語・英語・タイ語対応。読み取れない項目は「（不明）」。余分な説明文や前置きは不要。Markdownのみ出力。画像が上下逆転・横向きなど回転していても正しく読み取ってください。名刺の表面に書かれた情報を全て正確に抽出してください。';
-
-function buildPrompt(context, today) {
-  const followupDate = addMonths(today, 3);
-  return `名刺画像を読み取り、以下のフォーマットで出力してください。重要：氏名・会社名・役職は名刺に書かれた文字をそのまま転記してください。推測や補完は絶対にしないでください。読み取れない場合は「（不明）」としてください。
-
----
-# [名刺に記載の氏名をそのまま転記]
-会社: [名刺に記載の会社名をそのまま転記] / 役職: [名刺に記載の役職をそのまま転記]
-出会い: ${today} / ${context || '（場所未記入）'}
-重要度: 中
-フォロー要: NO
-Eight: 未登録
-
-## 会話メモ
-- （ここに後で追記）
-
-## フォローアップ
-- [ ] （ここに後で追記）
-- 次回連絡目安: ${followupDate}
-
-## 連絡履歴
-- ${today}: 初対面（${context || ''}）
-
-## 名刺情報（原文）
-- 氏名: [名刺記載の氏名]
-- 会社: [名刺記載の会社名]
-- 役職: [名刺記載の役職]
-- Email: [あれば、なければ省略]
-- Tel: [あれば、なければ省略]
----`;
-}
-
-function addMonths(dateStr, n) {
-  const d = new Date(dateStr);
-  d.setMonth(d.getMonth()+n);
-  return d.toISOString().split('T')[0];
-}
-
-async function startScan() {
-  const context = document.getElementById('contextInput').value.trim();
-  const today = new Date().toISOString().split('T')[0];
-  const container = document.getElementById('resultsArea');
-  container.innerHTML = '';
-  results.length = 0;
-  document.getElementById('submitBtn').disabled = true;
-
-  for (let i = 0; i < files.length; i++) {
-    const loadDiv = document.createElement('div');
-    loadDiv.className = 'result-card';
-    loadDiv.innerHTML = `<div class="status-row"><div class="spinner"></div><span>名刺 ${i+1}/${files.length} を解析中...</span></div>`;
-    container.appendChild(loadDiv);
-
-    try {
-      const prompt = buildPrompt(context, today);
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': anthropicKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true'
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-6',
-          max_tokens: 1000,
-          system: SYSTEM_PROMPT,
-          messages: [{ role:'user', content:[
-            { type:'image', source:{ type:'base64', media_type: files[i].mediaType, data: files[i].b64 } },
-            { type:'text', text: prompt }
-          ]}]
-        })
-      });
-
-      const data = await res.json();
-      if (data.error) throw new Error(data.error.type + ': ' + data.error.message);
-      if (!data.content) throw new Error('レスポンス異常: ' + JSON.stringify(data).slice(0,100));
-      const md = data.content.map(b=>b.text||'').join('').trim();
-      const nameMatch = md.match(/^# (.+)/m);
-      const name = nameMatch ? nameMatch[1].trim() : `名刺${i+1}`;
-      const filename = name.replace(/[^\w\u3040-\u9FFF\u30A0-\u30FF\u4E00-\u9FFF]/g,'_') + '.md';
-      results.push({ index:i+1, name, filename, md });
-
-      loadDiv.innerHTML = `
-        <div class="result-header">
-          <div class="result-name">${escHtml(name)}</div>
-          <div class="result-actions">
-            <button class="action-btn" onclick="copyMd(${i})">コピー</button>
-            <span class="action-btn saved" id="saveBtn-${i}">保存済 ✓</span>
-          </div>
-        </div>
-        <div class="result-body">${escHtml(md)}</div>`;
-
-      if (accessToken) { saveToDrive(i); }
-
-    } catch(e) {
-      const msg = e?.message || e?.name || String(e) || 'unknown error';
-      loadDiv.innerHTML = `<div class="status-row" style="color:#e07060">⚠ エラー: ${escHtml(msg)}</div>`;
-    }
-  }
-  document.getElementById('submitBtn').disabled = false;
-}
-
-// ── Google Drive ──
+// ── Google 接続 ──
 function toggleDrive() {
   if (accessToken) {
-    accessToken = null; driveFolderId = null;
+    accessToken = null; driveFolderId = null; cachedPeople = [];
     document.getElementById('driveBtn').classList.remove('connected');
     document.getElementById('driveIcon').textContent = '⬡';
-    document.getElementById('driveLabel').textContent = 'Drive接続';
-    showToast('Driveから切断しました');
+    document.getElementById('driveLabel').textContent = 'Drive/Gmail接続';
+    showToast('接続解除しました');
     return;
   }
   const client = google.accounts.oauth2.initTokenClient({
     client_id: GOOGLE_CLIENT_ID,
-    scope: 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets',
+    scope: 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/gmail.compose',
     callback: async (res) => {
-      if (res.error) { showToast('Drive接続エラー: '+res.error); return; }
+      if (res.error) { showToast('接続エラー: '+res.error); return; }
       accessToken = res.access_token;
       document.getElementById('driveBtn').classList.add('connected');
       document.getElementById('driveIcon').textContent = '✓';
-      document.getElementById('driveLabel').textContent = 'Drive接続中';
-      showToast('Google Driveに接続しました');
+      document.getElementById('driveLabel').textContent = '接続中';
+      showToast('接続しました');
       driveFolderId = await ensureFolder(DRIVE_FOLDER_NAME);
       await ensureSheetHeader();
     }
@@ -487,32 +303,7 @@ async function gapiReq(url, method='GET', body=null) {
   return (await fetch(url,opts)).json();
 }
 
-async function saveToDrive(i) {
-  if (!accessToken) return;
-  const { filename, md } = results[i];
-  const btn = document.getElementById('saveBtn-'+i);
-  if (!btn) return;
-  btn.textContent = '保存中...';
-  try {
-    if (!driveFolderId) driveFolderId = await ensureFolder(DRIVE_FOLDER_NAME);
-    const meta = JSON.stringify({ name:filename, mimeType:'text/markdown', parents:[driveFolderId] });
-    const form = new FormData();
-    form.append('metadata', new Blob([meta],{type:'application/json'}));
-    form.append('file', new Blob([md],{type:'text/markdown'}));
-    await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{
-      method:'POST', headers:{Authorization:`Bearer ${accessToken}`}, body:form
-    });
-    btn.textContent = '保存済 ✓'; btn.classList.add('saved');
-    await saveToSheet(results[i].md, document.getElementById('contextInput').value.trim());
-    showToast(`${results[i].name} を保存しました`);
-    cachedPeople = [];
-  } catch(e) {
-    btn.textContent = 'Drive保存';
-    showToast('保存エラー: '+e.message);
-  }
-}
-
-// ── Google Sheets ──
+// ── Sheet header ──
 async function ensureSheetHeader() {
   try {
     const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/A1:H1`,
@@ -528,185 +319,329 @@ async function ensureSheetHeader() {
   } catch(e) { console.error('Sheet header error:', e); }
 }
 
-async function saveToSheet(md, context) {
-  try {
-    const nameMatch  = md.match(/^# (.+)/m);
-    const compMatch  = md.match(/会社: ([^/\n]+)/);
-    const roleMatch  = md.match(/役職: ([^\n]+)/);
-    const memoMatch  = md.match(/## 会話メモ\n([\s\S]*?)\n##/);
-    const today      = new Date().toISOString().split('T')[0];
-    const name   = nameMatch   ? nameMatch[1].trim()   : '';
-    const comp   = compMatch   ? compMatch[1].trim()   : '';
-    const role   = roleMatch   ? roleMatch[1].trim()   : '';
-    const memo   = memoMatch   ? memoMatch[1].replace(/^- /gm,'').replace(/\n/g,' ').trim().slice(0,100) : '';
-    const emailMatch = md.match(/Email: ([^\n]+)/);
-    const email = emailMatch && !emailMatch[1].includes('不明') ? emailMatch[1].trim() : '';
-    await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/A:H:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`,{
-      method: 'POST',
-      headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ values: [[today, name, comp, role, context, email, '', memo]] })
-    });
-  } catch(e) { console.error('Sheet save error:', e); }
+// ── People cache (paginated) ──
+async function loadPeopleCache() {
+  if (!driveFolderId) driveFolderId = await ensureFolder(DRIVE_FOLDER_NAME);
+  const all = [];
+  let pageToken = '';
+  do {
+    const url = `https://www.googleapis.com/drive/v3/files?q='${driveFolderId}' in parents and mimeType='text/markdown' and trashed=false&fields=files(id,name),nextPageToken&orderBy=createdTime desc&pageSize=1000` + (pageToken ? `&pageToken=${pageToken}` : '');
+    const res = await gapiReq(url);
+    (res.files || []).forEach(f => all.push(f));
+    pageToken = res.nextPageToken || '';
+  } while (pageToken);
+  cachedPeople = all.map(f => {
+    const stem = f.name.replace(/\.md$/, '');
+    const sep = stem.indexOf('_');
+    const name = sep === -1 ? stem : stem.slice(0, sep);
+    const company = sep === -1 ? '' : stem.slice(sep + 1);
+    return { id: f.id, name, company, filename: f.name };
+  });
 }
 
-// ── Memo Tab ──
+// ── Metadata parse (Eight format + scan format 両対応) ──
+function parseMetadata(content) {
+  const meta = { name:'', company:'', role:'', email:'', date:'', importance:'', follow:'' };
+  const fm = content.match(/^---\n([\s\S]*?)\n---/);
+  if (fm) {
+    // Eight format
+    const f = fm[1];
+    meta.name    = (f.match(/^name:\s*(.+)$/m)    || [,''])[1].trim();
+    meta.company = (f.match(/^company:\s*(.+)$/m) || [,''])[1].trim();
+    meta.role    = (f.match(/^title:\s*(.+)$/m)   || [,''])[1].trim();
+    meta.date    = (f.match(/^date:\s*(.+)$/m)    || [,''])[1].trim();
+    meta.email   = (content.match(/\|\s*メール\s*\|\s*([^|\n]+?)\s*\|/) || [,''])[1].trim();
+  } else {
+    // scan format
+    meta.name       = (content.match(/^# (.+)/m)            || [,''])[1].trim();
+    meta.company    = (content.match(/会社:\s*([^/\n]+)/)    || [,''])[1].trim();
+    meta.role       = (content.match(/役職:\s*([^\n]+)/)     || [,''])[1].trim();
+    meta.date       = (content.match(/出会い:\s*(\S+)/)      || [,''])[1].trim();
+    meta.email      = (content.match(/Email:\s*([^\n]+)/)   || [,''])[1].trim();
+    meta.importance = (content.match(/重要度:\s*(.+)/)       || [,''])[1].trim();
+    meta.follow     = (content.match(/フォロー要:\s*(.+)/)   || [,''])[1].trim();
+  }
+  if (meta.email.includes('不明') || meta.email === '—' || meta.email === '-') meta.email = '';
+  return meta;
+}
+
+// ── Search ──
 async function searchPeople() {
   const query = document.getElementById('searchInput').value.trim();
-  if (!query || query.length < 2) {
-    document.getElementById('searchResults').innerHTML = '';
-    return;
+  const container = document.getElementById('searchResults');
+  if (!query || query.length < 2) { container.innerHTML = ''; return; }
+  if (!accessToken) { showToast('まず Drive/Gmail に接続してください'); return; }
+  if (cachedPeople.length === 0) {
+    container.innerHTML = '<div class="empty"><span class="spinner"></span> 人物リストを読み込み中...</div>';
+    try { await loadPeopleCache(); }
+    catch(e) { container.innerHTML = '<div class="empty">読み込み失敗: ' + escHtml(e.message) + '</div>'; return; }
   }
-  if (!accessToken) { showToast('まずDriveに接続してください'); return; }
-
-  // Load people list if not cached
-  if (cachedPeople.length === 0) await loadPeopleCache();
-
   const lower = query.toLowerCase();
   const matched = cachedPeople.filter(p =>
     p.name.toLowerCase().includes(lower) ||
     p.company.toLowerCase().includes(lower)
   );
-
-  const container = document.getElementById('searchResults');
   if (matched.length === 0) {
     container.innerHTML = '<div class="empty">見つかりませんでした</div>';
     return;
   }
-
-  container.innerHTML = matched.slice(0,5).map((p,i) => `
-    <div class="person-item" onclick="selectPerson(${cachedPeople.indexOf(p)})">
+  container.innerHTML = matched.slice(0,10).map(p => `
+    <div class="person-item" onclick="selectPerson('${p.id}')">
       <div class="person-name">${escHtml(p.name)}</div>
-      <div class="person-sub">${escHtml(p.company)} / ${escHtml(p.date)}</div>
-    </div>`).join('');
+      <div class="person-sub">${escHtml(p.company)}</div>
+    </div>`).join('') +
+    (matched.length > 10 ? `<div class="empty" style="padding:0.5rem;">他 ${matched.length - 10} 件。検索語を絞ってください</div>` : '');
 }
 
-async function loadPeopleCache() {
+async function selectPerson(fileId) {
+  const p = cachedPeople.find(x => x.id === fileId);
+  if (!p) return;
+  selectedPerson = p;
   try {
-    if (!driveFolderId) driveFolderId = await ensureFolder(DRIVE_FOLDER_NAME);
-    const res = await gapiReq(`https://www.googleapis.com/drive/v3/files?q='${driveFolderId}' in parents and mimeType='text/markdown' and trashed=false&fields=files(id,name)&orderBy=createdTime desc&pageSize=100`);
-    cachedPeople = (res.files || []).map(f => {
-      const name = f.name.replace('.md','').replace(/_/g,' ');
-      return { id: f.id, name, company: '', date: '', filename: f.name };
-    });
-  } catch(e) { showToast('ファイル一覧の取得に失敗しました'); }
-}
-
-async function selectPerson(index) {
-  selectedPerson = cachedPeople[index];
-  document.querySelectorAll('.person-item').forEach((el,i) => {
-    el.classList.toggle('selected', i === index);
-  });
-
-  // Load file content to get company info
-  try {
-    const res = await fetch(`https://www.googleapis.com/drive/v3/files/${selectedPerson.id}?alt=media`,
+    const res = await fetch(`https://www.googleapis.com/drive/v3/files/${p.id}?alt=media`,
       { headers: { Authorization: `Bearer ${accessToken}` } });
     const content = await res.text();
     selectedPerson.content = content;
-    const compMatch = content.match(/会社: ([^/\n]+)/);
-    const dateMatch = content.match(/出会い: ([^\s]+)/);
-    selectedPerson.company = compMatch ? compMatch[1].trim() : '';
-    selectedPerson.date = dateMatch ? dateMatch[1].trim() : '';
-  } catch(e) {}
+    const meta = parseMetadata(content);
+    selectedPerson.meta = meta;
 
-  document.getElementById('selectedPersonInfo').innerHTML =
-    `<strong>${escHtml(selectedPerson.name)}</strong><br>
-     <span style="font-size:12px;color:var(--muted)">${escHtml(selectedPerson.company)} / ${escHtml(selectedPerson.date)}</span>`;
-  document.getElementById('memoSection').style.display = 'flex';
-  document.getElementById('memoTextarea').value = '';
-  document.getElementById('importanceSelect').value = '';
-  document.getElementById('followSelect').value = '';
+    document.getElementById('selectedPersonInfo').innerHTML =
+      `<div style="font-weight:500;font-size:14px;">${escHtml(meta.name || p.name)}</div>
+       <div style="font-size:12px;color:var(--muted);margin-top:2px;">${escHtml(meta.company || p.company)}${meta.role ? ' / '+escHtml(meta.role):''}</div>
+       <div style="font-size:12px;margin-top:4px;">${meta.email ? '📧 '+escHtml(meta.email) : '<span style="color:var(--danger)">メアド未登録 — メール下書きは使えません</span>'}</div>`;
+
+    document.getElementById('personSection').style.display = 'flex';
+    document.getElementById('searchResults').innerHTML = '';
+    document.getElementById('memoTextarea').value = '';
+    document.getElementById('contextInput').value = '';
+    document.getElementById('importanceSelect').value = '';
+    document.getElementById('followSelect').value = '';
+    document.getElementById('draftPreview').style.display = 'none';
+    document.getElementById('draftPreview').innerHTML = '';
+
+    document.getElementById('generateEmailBtn').disabled = !meta.email || !anthropicKey;
+  } catch(e) { showToast('読み込みエラー: '+e.message); }
 }
 
-async function saveMemo() {
+// ── Save to Markdown + Sheet ──
+async function saveMemoToMarkdown(memo, importance, follow) {
+  const today = new Date().toISOString().split('T')[0];
+  let content = selectedPerson.content;
+
+  if (memo) {
+    const lines = memo.split('\n').filter(l=>l.trim()).map(l=>`- [${today}] ${l}`).join('\n');
+    if (content.includes('## 会話メモ')) {
+      content = content.replace('- （ここに後で追記）', '');
+      content = content.replace('## 会話メモ\n', `## 会話メモ\n${lines}\n`);
+    } else if (/## メモ\s*\n/.test(content)) {
+      content = content.replace(/## メモ\s*\n/, `## メモ\n${lines}\n`);
+    } else {
+      content += `\n\n## メモ\n${lines}\n`;
+    }
+  }
+  if (importance && /重要度:/.test(content)) {
+    content = content.replace(/重要度:\s*.+/, `重要度: ${importance}`);
+  }
+  if (follow && /フォロー要:/.test(content)) {
+    content = content.replace(/フォロー要:\s*.+/, `フォロー要: ${follow}`);
+  }
+  if (memo) {
+    if (content.includes('## 連絡履歴')) {
+      content = content.replace('## 連絡履歴\n', `## 連絡履歴\n- ${today}: メモ追加\n`);
+    } else {
+      content += `\n## 連絡履歴\n- ${today}: メモ追加\n`;
+    }
+  }
+
+  await fetch(`https://www.googleapis.com/upload/drive/v3/files/${selectedPerson.id}?uploadType=media`,{
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'text/markdown' },
+    body: content
+  });
+  selectedPerson.content = content;
+  return today;
+}
+
+async function upsertSheetRow({ meta, lastContact, memoExcerpt, event }) {
+  try {
+    const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/A:H`,
+      { headers: { Authorization: `Bearer ${accessToken}` } });
+    const rows = (await res.json()).values || [];
+    const nameKey = (meta.name||'').trim();
+    const compKey = (meta.company||'').trim();
+    const idx = rows.findIndex((r,i) => i>0 && (r[1]||'').trim() === nameKey && (r[2]||'').trim() === compKey);
+    if (idx === -1) {
+      await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/A:H:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ values: [[meta.date || lastContact, meta.name, meta.company, meta.role, event || '', meta.email || '', lastContact, memoExcerpt || '']] })
+      });
+    } else {
+      const row = rows[idx];
+      const newMemo = memoExcerpt ? (row[7] ? row[7] + ' | ' + memoExcerpt : memoExcerpt) : (row[7]||'');
+      await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/A${idx+1}:H${idx+1}?valueInputOption=RAW`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ values: [[row[0]||meta.date||lastContact, meta.name, meta.company, meta.role, event || row[4] || '', meta.email || row[5] || '', lastContact, newMemo]] })
+      });
+    }
+  } catch(e) { console.error('Sheet upsert error:', e); }
+}
+
+// ── Memo only ──
+async function saveMemoOnly() {
   if (!selectedPerson) return;
   const memo = document.getElementById('memoTextarea').value.trim();
   const importance = document.getElementById('importanceSelect').value;
   const follow = document.getElementById('followSelect').value;
+  const context = document.getElementById('contextInput').value.trim();
+  if (!memo && !importance && !follow) { showToast('メモを入力してください'); return; }
 
-  if (!memo && !importance && !follow) {
-    showToast('メモを入力してください');
-    return;
-  }
-
-  const btn = document.getElementById('saveMemoBtn');
-  btn.textContent = '保存中...';
-  btn.disabled = true;
-
+  const btn = document.getElementById('saveMemoOnlyBtn');
+  btn.textContent = '保存中...'; btn.disabled = true;
   try {
-    const today = new Date().toISOString().split('T')[0];
-    let content = selectedPerson.content || '';
-
-    // Add memo to 会話メモ section
-    if (memo) {
-      const memoLines = memo.split('\n').filter(l=>l.trim()).map(l=>`- [${today}] ${l}`).join('\n');
-      if (content.includes('## 会話メモ')) {
-        content = content.replace('- （ここに後で追記）', '');
-        content = content.replace('## 会話メモ\n', `## 会話メモ\n${memoLines}\n`);
-      }
-    }
-
-    // Update importance
-    if (importance) {
-      content = content.replace(/重要度: .+/, `重要度: ${importance}`);
-    }
-
-    // Update follow
-    if (follow) {
-      content = content.replace(/フォロー要: .+/, `フォロー要: ${follow}`);
-    }
-
-    // Add to 連絡履歴
-    if (memo) {
-      const historyEntry = `- ${today}: メモ追加`;
-      content = content.replace('## 連絡履歴\n', `## 連絡履歴\n${historyEntry}\n`);
-    }
-
-    // Save back to Drive
-    await fetch(`https://www.googleapis.com/upload/drive/v3/files/${selectedPerson.id}?uploadType=media`,{
-      method: 'PATCH',
-      headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'text/markdown' },
-      body: content
-    });
-
-    // Update sheet memo column
-    if (memo) await updateSheetMemo(selectedPerson.name, memo, today);
-
-    showToast(`${selectedPerson.name} のメモを保存しました`);
-    clearMemoForm();
+    const today = await saveMemoToMarkdown(memo, importance, follow);
+    await upsertSheetRow({ meta: selectedPerson.meta, lastContact: today, memoExcerpt: memo.slice(0,100), event: context });
+    showToast(`${selectedPerson.meta.name || selectedPerson.name} のメモを保存しました`);
+    clearPersonForm();
   } catch(e) {
-    showToast('保存エラー: ' + e.message);
+    showToast('エラー: '+e.message);
   } finally {
-    btn.textContent = 'メモを保存';
-    btn.disabled = false;
+    btn.textContent = 'メモのみ保存'; btn.disabled = false;
   }
 }
 
-async function updateSheetMemo(name, memo, date) {
+// ── Email generation + Gmail draft ──
+async function saveAndGenerateEmail() {
+  if (!selectedPerson) return;
+  const meta = selectedPerson.meta;
+  if (!meta.email) { showToast('メアドが未登録です'); return; }
+  if (!anthropicKey) { showToast('APIキーを設定してください'); return; }
+
+  const memo = document.getElementById('memoTextarea').value.trim();
+  const context = document.getElementById('contextInput').value.trim();
+  const importance = document.getElementById('importanceSelect').value;
+  const follow = document.getElementById('followSelect').value;
+
+  const btn = document.getElementById('generateEmailBtn');
+  const orig = btn.textContent;
+  btn.textContent = '生成中...'; btn.disabled = true;
   try {
-    const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/A:H`,
-      { headers: { Authorization: `Bearer ${accessToken}` } });
-    const data = await res.json();
-    const rows = data.values || [];
-    const rowIndex = rows.findIndex((r,i) => i > 0 && r[1] && r[1].includes(name.split('（')[0].trim()));
-    if (rowIndex > 0) {
-      const currentMemo = rows[rowIndex][7] || '';
-      const newMemo = currentMemo ? currentMemo + ' | ' + memo.slice(0,50) : memo.slice(0,50);
-      await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/H${rowIndex+1}?valueInputOption=RAW`,{
-        method: 'PUT',
-        headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ values: [[newMemo]] })
-      });
-    }
-  } catch(e) { console.error('Sheet memo update error:', e); }
+    const today = await saveMemoToMarkdown(memo, importance, follow);
+    await upsertSheetRow({ meta, lastContact: today, memoExcerpt: memo.slice(0,100), event: context });
+
+    const { subject, body } = await generateEmail(meta, context, memo);
+    const fullBody = body + '\n\n' + SIGNATURE;
+    await createGmailDraft(meta.email, meta.name, subject, fullBody);
+
+    document.getElementById('draftPreview').style.display = 'block';
+    document.getElementById('draftPreview').innerHTML = `
+      <div class="result-card">
+        <div class="result-header">
+          <div class="result-name">Gmail下書き作成完了</div>
+          <div class="result-actions">
+            <a href="https://mail.google.com/mail/u/0/#drafts" target="_blank" class="action-btn saved">Gmail で開く ↗</a>
+          </div>
+        </div>
+        <div class="result-body">件名: ${escHtml(subject)}
+
+To: ${escHtml(meta.email)}
+
+${escHtml(fullBody)}</div>
+      </div>`;
+    showToast('下書きを作成しました');
+  } catch(e) {
+    showToast('エラー: '+e.message);
+  } finally {
+    btn.textContent = orig; btn.disabled = false;
+  }
 }
 
-function clearMemoForm() {
+async function generateEmail(meta, eventContext, conversationMemo) {
+  const prompt = `あなたはタイ・バンコク在住のHRコンサルタント「Jack Nakamura (中村 勝宏)」(Asian Identity Co., Ltd. 代表)として、名刺交換後のお礼メールを日本語で書いてください。
+
+【相手情報】
+氏名: ${meta.name}
+会社: ${meta.company}
+役職: ${meta.role}
+
+【きっかけ・場所】
+${eventContext || '（未記入）'}
+
+【会話メモ】
+${conversationMemo || '（特になし）'}
+
+【要件】
+- 宛名は「${meta.company}\n${meta.role} ${meta.name}様」の形式（会社と氏名は改行で分ける）
+- 丁寧だが堅すぎず、ビジネスで信頼感を与える文体
+- 250〜350字程度
+- 会話メモに具体的内容があれば1文だけ自然に触れる（「〜について伺えて」など）
+- 「今後ともよろしくお願いいたします」で締める
+- 署名は書かない（自動で付与される）
+
+【出力形式】
+件名: <簡潔な件名>
+
+<本文>`;
+
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': anthropicKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 800,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.type + ': ' + data.error.message);
+  if (!data.content) throw new Error('レスポンス異常');
+  const text = data.content.map(b => b.text || '').join('').trim();
+  const subMatch = text.match(/件名:\s*(.+)/);
+  const subject = subMatch ? subMatch[1].trim() : `ご挨拶 / Asian Identity 中村`;
+  const body = text.replace(/^[\s\S]*?件名:\s*.+\n+/, '').trim();
+  return { subject, body };
+}
+
+async function createGmailDraft(to, toName, subject, body) {
+  const utf8b64 = (s) => btoa(unescape(encodeURIComponent(s)));
+  const encSubject = `=?UTF-8?B?${utf8b64(subject)}?=`;
+  const toHeader = toName ? `=?UTF-8?B?${utf8b64(toName)}?= <${to}>` : to;
+  const message = [
+    `To: ${toHeader}`,
+    `Subject: ${encSubject}`,
+    `MIME-Version: 1.0`,
+    `Content-Type: text/plain; charset=UTF-8`,
+    `Content-Transfer-Encoding: 8bit`,
+    ``,
+    body
+  ].join('\r\n');
+  const encoded = utf8b64(message)
+    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  const res = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/drafts', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message: { raw: encoded } })
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message);
+  return data;
+}
+
+function clearPersonForm() {
   selectedPerson = null;
   document.getElementById('searchInput').value = '';
   document.getElementById('searchResults').innerHTML = '';
-  document.getElementById('memoSection').style.display = 'none';
+  document.getElementById('personSection').style.display = 'none';
   document.getElementById('memoTextarea').value = '';
+  document.getElementById('contextInput').value = '';
+  document.getElementById('draftPreview').style.display = 'none';
+  document.getElementById('draftPreview').innerHTML = '';
 }
 
 // ── Voice ──
@@ -742,38 +677,10 @@ function setRecording(v) {
   document.getElementById('voiceLabel').textContent = v ? '録音中… タップで停止' : 'マイクで話す';
 }
 
-// ── List Tab ──
-async function loadList() {
-  if (!accessToken) { showToast('まずDriveに接続してください'); return; }
-  const area = document.getElementById('listArea');
-  area.innerHTML = '<div class="empty">読み込み中...</div>';
-  try {
-    const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/A:H`,
-      { headers: { Authorization: `Bearer ${accessToken}` } });
-    const data = await res.json();
-    const rows = (data.values || []).slice(1).filter(r => r[1]);
-    if (rows.length === 0) { area.innerHTML = '<div class="empty">データがありません</div>'; return; }
-    area.innerHTML = '<div style="display:flex;flex-direction:column;gap:8px;">' +
-      rows.reverse().map(r => `
-        <div class="list-item">
-          <div class="list-info">
-            <div class="list-name">${escHtml(r[1]||'')}</div>
-            <div class="list-sub">${escHtml(r[2]||'')} / ${escHtml(r[0]||'')}</div>
-          </div>
-          <div class="list-flag ${r[5]==='YES'?'follow':''}">${r[5]==='YES'?'フォロー要':'　'}</div>
-        </div>`).join('') + '</div>';
-  } catch(e) { area.innerHTML = '<div class="empty">読み込みエラー: ' + escHtml(e.message) + '</div>'; }
-}
-
 // ── Utils ──
-function copyMd(i) {
-  navigator.clipboard.writeText(results[i].md).then(()=>showToast('コピーしました'));
-}
-
 function escHtml(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-
 let toastTimer;
 function showToast(msg) {
   const el = document.getElementById('toast');
@@ -782,5 +689,6 @@ function showToast(msg) {
   toastTimer = setTimeout(()=>el.classList.remove('show'), 2500);
 }
 </script>
+
 </body>
 </html>
