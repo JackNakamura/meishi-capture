@@ -45,12 +45,21 @@ body { background: var(--bg); color: var(--text); font-family: -apple-system,'Hi
 /* Labels */
 .section-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
 
-/* API Key */
+/* API Key (collapsible) */
+.apikey-box { border: 0.5px solid var(--border); border-radius: var(--radius); background: var(--surface); overflow: hidden; }
+.apikey-box summary { cursor: pointer; font-size: 12px; color: var(--muted); padding: 10px 14px; list-style: none; display: flex; align-items: center; justify-content: space-between; }
+.apikey-box summary::-webkit-details-marker { display: none; }
+.apikey-box summary::after { content: '▾'; color: var(--muted); font-size: 10px; margin-left: 8px; }
+.apikey-box[open] summary { border-bottom: 0.5px solid var(--border); }
+.apikey-box[open] summary::after { content: '▴'; }
+.apikey-badge { font-size: 11px; color: var(--muted); }
+.apikey-badge.ok { color: var(--success); }
+.apikey-body { padding: 12px 14px; }
 .apikey-row { display: flex; gap: 8px; }
-.apikey-row input { flex: 1; border-radius: var(--radius); border: 0.5px solid var(--border); padding: 10px 12px; font-size: 13px; font-family: monospace; color: var(--text); background: var(--surface); outline: none; }
+.apikey-row input { flex: 1; border-radius: var(--radius-sm); border: 0.5px solid var(--border); padding: 10px 12px; font-size: 13px; font-family: monospace; color: var(--text); background: var(--bg); outline: none; }
 .apikey-row input:focus { border-color: var(--accent); }
-.apikey-save { padding: 10px 16px; border-radius: var(--radius); border: 0.5px solid var(--accent); background: var(--accent-dim); color: var(--accent); font-size: 13px; cursor: pointer; white-space: nowrap; }
-.apikey-status { font-size: 12px; color: var(--muted); margin-top: 4px; }
+.apikey-save { padding: 10px 16px; border-radius: var(--radius-sm); border: 0.5px solid var(--accent); background: var(--accent-dim); color: var(--accent); font-size: 13px; cursor: pointer; white-space: nowrap; }
+.apikey-status { font-size: 12px; color: var(--muted); margin-top: 6px; }
 .apikey-status.ok { color: var(--success); }
 
 /* Inputs */
@@ -128,14 +137,19 @@ select { border-radius: var(--radius); border: 0.5px solid var(--border); paddin
   <!-- TAB: MAIN -->
   <div class="tab-content active" id="tab-main">
 
-    <div>
-      <div class="section-label">Anthropic APIキー（メール生成に使用）</div>
-      <div class="apikey-row">
-        <input type="password" id="apiKeyInput" placeholder="sk-ant-..." autocomplete="off">
-        <button class="apikey-save" onclick="saveApiKey()">保存</button>
+    <details class="apikey-box" id="apiKeyBox">
+      <summary>
+        <span>⚙️ Anthropic APIキー（メール生成用）</span>
+        <span class="apikey-badge" id="apiKeyBadge">未設定</span>
+      </summary>
+      <div class="apikey-body">
+        <div class="apikey-row">
+          <input type="password" id="apiKeyInput" placeholder="sk-ant-..." autocomplete="off">
+          <button class="apikey-save" onclick="saveApiKey()">保存</button>
+        </div>
+        <div class="apikey-status" id="apiKeyStatus">未設定</div>
       </div>
-      <div class="apikey-status" id="apiKeyStatus">未設定</div>
-    </div>
+    </details>
 
     <div>
       <div class="section-label">相手を検索（氏名・会社名）</div>
@@ -230,6 +244,8 @@ document.getElementById('headerDate').textContent = new Date().toLocaleDateStrin
     document.getElementById('apiKeyInput').value = saved;
     document.getElementById('apiKeyStatus').textContent = '設定済み ✓';
     document.getElementById('apiKeyStatus').className = 'apikey-status ok';
+    document.getElementById('apiKeyBadge').textContent = '✓ 設定済み';
+    document.getElementById('apiKeyBadge').className = 'apikey-badge ok';
   }
 })();
 
@@ -245,17 +261,20 @@ function switchTab(name) {
 // ── API Key ──
 function saveApiKey() {
   const val = document.getElementById('apiKeyInput').value.trim();
+  const badge = document.getElementById('apiKeyBadge');
+  const status = document.getElementById('apiKeyStatus');
   if (!val || val.length < 20) {
     anthropicKey = '';
     localStorage.removeItem('anthropic_key');
-    document.getElementById('apiKeyStatus').textContent = '未設定';
-    document.getElementById('apiKeyStatus').className = 'apikey-status';
+    status.textContent = '未設定'; status.className = 'apikey-status';
+    badge.textContent = '未設定'; badge.className = 'apikey-badge';
     return;
   }
   anthropicKey = val;
   localStorage.setItem('anthropic_key', val);
-  document.getElementById('apiKeyStatus').textContent = '設定済み ✓';
-  document.getElementById('apiKeyStatus').className = 'apikey-status ok';
+  status.textContent = '設定済み ✓'; status.className = 'apikey-status ok';
+  badge.textContent = '✓ 設定済み'; badge.className = 'apikey-badge ok';
+  document.getElementById('apiKeyBox').open = false;
   showToast('APIキーを保存しました');
 }
 
