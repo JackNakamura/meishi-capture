@@ -271,7 +271,7 @@ function toggleDrive() {
   }
   const client = google.accounts.oauth2.initTokenClient({
     client_id: GOOGLE_CLIENT_ID,
-    scope: 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/gmail.compose',
+    scope: 'https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/gmail.compose',
     callback: async (res) => {
       if (res.error) { showToast('接続エラー: '+res.error); return; }
       accessToken = res.access_token;
